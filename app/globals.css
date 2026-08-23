@@ -1,0 +1,239 @@
+@import "tailwindcss";
+
+@theme {
+  --color-brand: #5f47eb;
+  --color-volt: #beee54;
+  --color-ink: #0a2233;
+  --color-aqua: #2de2e6;
+  --color-ink-deep: #06314a;
+  --color-ink-soft: color-mix(in srgb, var(--color-ink) 86%, #ffffff);
+
+  /* Hover/press pair for filled brand controls, mirroring ink-soft/ink-deep. */
+  --color-brand-soft: color-mix(in srgb, var(--color-brand) 88%, #ffffff);
+  --color-brand-deep: color-mix(in srgb, var(--color-brand) 82%, var(--color-ink));
+
+  --color-surface: #ffffff;
+  /* Soft surfaces carry a brand tint, not grey — the house theme is purple. */
+  --color-surface-soft: color-mix(in srgb, var(--color-brand) 6%, #ffffff);
+  --color-hairline: color-mix(in srgb, var(--color-ink) 12%, transparent);
+
+  --color-muted: color-mix(in srgb, var(--color-ink) 62%, transparent);
+  --color-muted-invert: color-mix(in srgb, #ffffff 72%, transparent);
+
+  --color-success: #12b76a;
+  --color-danger: #f97066;
+  --color-trustpilot: #00b67a;
+
+  --font-sans:
+    var(--font-satoshi), ui-sans-serif, system-ui, -apple-system, "Segoe UI",
+    sans-serif;
+
+  --font-display:
+    var(--font-figtree), var(--font-satoshi), ui-sans-serif, system-ui,
+    sans-serif;
+
+  --text-display: clamp(2.75rem, 1.6rem + 5.6vw, 5.5rem);
+  --text-display--line-height: 0.95;
+  --text-display--letter-spacing: -0.045em;
+  --text-display--font-weight: 700;
+
+  --text-h1: clamp(2.25rem, 1.5rem + 3.2vw, 3.5rem);
+  --text-h1--line-height: 1.03;
+  --text-h1--letter-spacing: -0.025em;
+  --text-h1--font-weight: 700;
+
+  --text-h2: clamp(1.75rem, 1.3rem + 2vw, 2.5rem);
+  --text-h2--line-height: 1.08;
+  --text-h2--letter-spacing: -0.02em;
+  --text-h2--font-weight: 700;
+
+  --text-h3: clamp(1.25rem, 1.1rem + 0.9vw, 1.625rem);
+  --text-h3--line-height: 1.2;
+  --text-h3--letter-spacing: -0.015em;
+  --text-h3--font-weight: 700;
+
+  --text-eyebrow: 0.75rem;
+  --text-eyebrow--line-height: 1;
+  --text-eyebrow--letter-spacing: 0.14em;
+  --text-eyebrow--font-weight: 500;
+
+  --radius-card: 1.25rem;
+  --radius-sheet: 1.75rem;
+  --radius-control: 0.875rem;
+  --radius-screen: 1.25rem;
+  --radius-screen-lg: 2rem;
+
+  --ease-ios: cubic-bezier(0.32, 0.72, 0, 1);
+  --ease-pop: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --ease-hover: cubic-bezier(0.4, 0, 0.2, 1);
+
+  --duration-hover: 300ms;
+
+  --header-height: 4.5rem;
+}
+
+/*
+ * Hover and press feedback for Pressable. Colours ease over --duration-hover,
+ * the scale snaps back in 120ms.
+ *
+ * Never put a `transition-*` utility on an element that also carries `press`:
+ * it replaces this transition-property list, transform drops out, and the
+ * scale jumps instead of easing. Colour transitions are already covered here.
+ */
+@utility press {
+  transition-property:
+    color, background-color, border-color, box-shadow, opacity, filter,
+    text-decoration-color, transform;
+  transition-duration: var(--duration-hover), var(--duration-hover),
+    var(--duration-hover), var(--duration-hover), var(--duration-hover),
+    var(--duration-hover), var(--duration-hover), 120ms;
+  transition-timing-function: var(--ease-hover);
+
+  &:active {
+    transform: scale(0.94);
+    transition-timing-function: var(--ease-ios);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    transition-duration: 0.01ms;
+
+    &:active {
+      transform: none;
+    }
+  }
+}
+
+@utility scroll-subtle {
+  scrollbar-width: thin;
+  scrollbar-color: color-mix(in srgb, #ffffff 22%, transparent) transparent;
+
+  @supports not (scrollbar-color: auto) {
+    &::-webkit-scrollbar {
+      width: 6px;
+    }
+
+    &::-webkit-scrollbar-track {
+      background: transparent;
+    }
+
+    &::-webkit-scrollbar-thumb {
+      background: color-mix(in srgb, #ffffff 22%, transparent);
+      border: 0;
+      border-radius: 999px;
+    }
+
+    &::-webkit-scrollbar-thumb:hover {
+      background: color-mix(in srgb, #ffffff 36%, transparent);
+    }
+  }
+}
+
+@utility scroll-none {
+  scrollbar-width: none;
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+@utility scroll-slim {
+  scrollbar-width: thin;
+  scrollbar-color: color-mix(in srgb, var(--color-ink) 22%, transparent)
+    transparent;
+
+  @supports not (scrollbar-color: auto) {
+    &::-webkit-scrollbar {
+      width: 6px;
+    }
+
+    &::-webkit-scrollbar-track {
+      background: transparent;
+    }
+
+    &::-webkit-scrollbar-thumb {
+      background: color-mix(in srgb, var(--color-ink) 22%, transparent);
+      border: 0;
+      border-radius: 999px;
+    }
+
+    &::-webkit-scrollbar-thumb:hover {
+      background: color-mix(in srgb, var(--color-ink) 36%, transparent);
+    }
+  }
+}
+
+@layer base {
+  html {
+    overscroll-behavior-y: none;
+    -webkit-text-size-adjust: 100%;
+
+    scroll-padding-top: calc(var(--header-height) + env(safe-area-inset-top));
+    scrollbar-width: thin;
+    scrollbar-color: color-mix(in srgb, var(--color-ink) 22%, transparent)
+      color-mix(in srgb, var(--color-ink) 8%, #ffffff);
+  }
+
+  @supports not (scrollbar-color: auto) {
+    ::-webkit-scrollbar {
+      width: 8px;
+      height: 8px;
+    }
+
+    ::-webkit-scrollbar-track {
+      background: color-mix(in srgb, var(--color-ink) 8%, #ffffff);
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: color-mix(in srgb, var(--color-ink) 22%, transparent);
+      border: 2px solid color-mix(in srgb, var(--color-ink) 8%, #ffffff);
+      border-radius: 999px;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+      background: color-mix(in srgb, var(--color-ink) 34%, transparent);
+    }
+  }
+
+  body {
+    background-color: var(--color-surface);
+    color: var(--color-ink);
+    font-family: var(--font-sans);
+    font-weight: 500;
+    -webkit-font-smoothing: antialiased;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4 {
+    font-weight: 700;
+    text-wrap: balance;
+  }
+
+  input,
+  select,
+  textarea {
+    font-size: max(16px, 1em);
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-brand);
+    outline-offset: 2px;
+  }
+
+  ::selection {
+    background-color: var(--color-brand);
+    color: #ffffff;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      scroll-behavior: auto !important;
+    }
+  }
+}
