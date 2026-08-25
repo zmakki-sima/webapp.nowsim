@@ -50,9 +50,9 @@ export function EsimList({ esims, title }: { esims: Esim[]; title: string }) {
       <Pressable
         href="/destinations"
         className={cn(
-          "mt-8 w-full gap-2 rounded-full bg-brand px-8 py-4",
+          "mt-8 w-full gap-2 rounded-full bg-ink px-8 py-4",
           "text-base font-bold text-white",
-          "hover:bg-brand-soft active:bg-brand-soft",
+          "hover:bg-ink-soft active:bg-ink-soft",
         )}
       >
         <MdAdd aria-hidden className="h-5 w-5 shrink-0" />
