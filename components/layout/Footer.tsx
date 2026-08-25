@@ -1,6 +1,8 @@
 import Image from "next/image";
 import { cacheLife } from "next/cache";
-import { FaCcStripe } from "react-icons/fa6";
+import type { IconType } from "react-icons";
+import { FaCcStripe, FaWhatsapp } from "react-icons/fa6";
+import { MdCall, MdMailOutline } from "react-icons/md";
 
 import { NowsimLogo } from "@/components/ui/NowsimLogo";
 import { Pressable } from "@/components/ui/Pressable";
@@ -49,6 +51,22 @@ const groups: LinkGroup[] = [
   },
 ];
 
+/** TODO: swap in the real support line before launch. */
+const supportPhone = "+96800000000";
+const supportEmail = "support@nowsim.com";
+
+type Contact = { label: string; href: string; Icon: IconType };
+
+const contacts: Contact[] = [
+  { label: "Email us", href: `mailto:${supportEmail}`, Icon: MdMailOutline },
+  { label: "Call us", href: `tel:${supportPhone}`, Icon: MdCall },
+  {
+    label: "Chat on WhatsApp",
+    href: `https://wa.me/${supportPhone.replace(/\D/g, "")}`,
+    Icon: FaWhatsapp,
+  },
+];
+
 const badgeSize = { width: 120, height: 40 };
 
 /** Shown as artwork only — the apps are not published yet. */
@@ -75,7 +93,7 @@ export async function Footer() {
     <footer>
       <div
         className={cn(
-          "overflow-hidden rounded-t-screen bg-ink text-white md:rounded-t-screen-lg",
+          "overflow-hidden bg-ink text-white",
           "px-6 pt-14 md:px-12 md:pt-20",
           bottomPadding,
         )}
@@ -130,6 +148,24 @@ export async function Footer() {
                 wherever&rsquo;s next.
               </p>
 
+              <ul className="mt-6 flex items-center gap-3">
+                {contacts.map(({ label, href, Icon }) => (
+                  <li key={label}>
+                    <Pressable
+                      href={href}
+                      aria-label={label}
+                      title={label}
+                      className={cn(
+                        "size-11 rounded-full border border-white/15 bg-white/5",
+                        "text-white/70 transition-colors",
+                        "hover:border-white/30 hover:bg-white/10 hover:text-white",
+                      )}
+                    >
+                      <Icon aria-hidden className="size-5" />
+                    </Pressable>
+                  </li>
+                ))}
+              </ul>
             </div>
 
             <div className="flex flex-wrap gap-x-12 gap-y-8 md:shrink-0">
