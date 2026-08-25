@@ -10,7 +10,7 @@ import { Step } from "@/components/sections/checkout/Step";
 import { Pressable } from "@/components/ui/Pressable";
 import { useRouter } from "next/navigation";
 import type { Account } from "@/lib/auth/account";
-import { authProviders, legalLinks, providerNames } from "@/lib/auth/providers";
+import { authProviders, legalLinks } from "@/lib/auth/providers";
 import type { ProviderId } from "@/lib/auth/providers";
 import { cn } from "@/lib/cn";
 
@@ -74,7 +74,7 @@ function SignedIn({ account }: { account: Account }) {
       <div className="mt-6 flex flex-wrap items-center gap-4 rounded-card border border-hairline bg-surface-soft p-4">
         <span
           aria-hidden
-          className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-volt text-ink"
+          className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-brand text-white"
         >
           <MdPerson className="h-6 w-6" />
         </span>
@@ -86,17 +86,13 @@ function SignedIn({ account }: { account: Account }) {
         </div>
 
         <div className="flex items-center gap-3">
-          <span className="hidden text-sm font-medium text-muted sm:inline">
-            via {providerNames[account.provider]}
-          </span>
-
           <Pressable
             onClick={leave}
             disabled={leaving}
             className={cn(
-              "rounded-full border border-hairline px-4 py-2",
-              "text-sm font-bold",
-              "hover:border-ink/25 hover:bg-surface active:bg-surface",
+              "rounded-full border border-brand px-4 py-2",
+              "text-sm font-bold text-brand",
+              "hover:bg-brand/8 active:bg-brand/8",
             )}
           >
             {leaving ? "Signing out…" : "Sign out"}
@@ -158,7 +154,7 @@ function SignedOut() {
 
 export function AccountStep({ account }: { account: Account | null }) {
   return (
-    <Step index={1} title="Your account" done={account !== null}>
+    <Step index={1} title="Your account">
       {account ? <SignedIn account={account} /> : <SignedOut />}
     </Step>
   );
