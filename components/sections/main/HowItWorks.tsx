@@ -85,6 +85,15 @@ export function HowItWorks() {
           How nowsim <span className="text-brand">works</span>
         </h2>
 
+        <p
+          className={cn(
+            "mx-auto mt-5 max-w-[46ch] text-center",
+            "text-lg text-muted md:text-xl",
+          )}
+        >
+          Three steps from picking a plan to landing connected.
+        </p>
+
         <ol className="mt-10 md:mt-16">
           {steps.map((step, index) => (
             <li
