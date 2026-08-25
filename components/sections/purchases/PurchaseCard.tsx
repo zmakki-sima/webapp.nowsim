@@ -9,7 +9,7 @@ import { formatDay } from "@/lib/units";
 const spec = cn(
   "shrink-0 rounded-full px-2.5 py-0.5",
   "text-[0.8125rem]/[1.125rem] font-medium text-muted",
-  "bg-brand/10",
+  "bg-ink/8",
 );
 
 const pill = cn(
@@ -35,11 +35,11 @@ export function PurchaseCard({ purchase }: { purchase: Purchase }) {
   const { plan, price } = purchase;
 
   return (
-    <li className="rounded-sheet bg-brand/6 p-5 md:p-6">
+    <li className="rounded-sheet bg-ink/5 p-5 md:p-6">
       <div className="flex items-start justify-between gap-4">
         <div className="flex min-w-0 items-center gap-3.5">
           {plan?.art ? (
-            <span className="relative h-11 w-11 shrink-0 overflow-hidden rounded-full bg-brand/12">
+            <span className="relative h-11 w-11 shrink-0 overflow-hidden rounded-full bg-ink/8">
               <Image
                 src={plan.art}
                 alt=""
@@ -51,8 +51,8 @@ export function PurchaseCard({ purchase }: { purchase: Purchase }) {
               />
             </span>
           ) : (
-            <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-brand/12">
-              <MdReceiptLong aria-hidden className="h-5 w-5 text-brand" />
+            <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-ink/8">
+              <MdReceiptLong aria-hidden className="h-5 w-5 text-muted" />
             </span>
           )}
 

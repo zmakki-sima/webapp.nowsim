@@ -3,7 +3,6 @@
 import Image from "next/image";
 import { useEffect, useState } from "react";
 import {
-  MdAddCircleOutline,
   MdCheck,
   MdMailOutline,
   MdQrCode2,
@@ -30,7 +29,7 @@ const pill = cn(
 const spec = cn(
   "shrink-0 rounded-full px-2.5 py-0.5",
   "text-[0.8125rem]/[1.125rem] font-medium text-muted",
-  "bg-brand/10",
+  "bg-ink/8",
 );
 
 const pillTone: Record<EsimState, string> = {
@@ -40,7 +39,9 @@ const pillTone: Record<EsimState, string> = {
   removed: "bg-ink/8 text-muted",
 };
 
-const action = cn("rounded-full px-5 py-2.5 text-sm font-bold");
+const action = cn(
+  "rounded-full border border-transparent px-5 py-2.5 text-sm font-bold",
+);
 
 const primary = cn(
   action,
@@ -50,11 +51,11 @@ const primary = cn(
 
 const secondary = cn(
   action,
-  "bg-surface text-ink",
-  "hover:bg-surface/70 active:bg-surface/70",
+  "border-brand bg-brand/10 text-brand",
+  "hover:bg-brand/20 active:bg-brand/20",
 );
 
-const quiet = cn(action, "bg-surface/60 text-muted");
+const quiet = cn(action, "border-hairline bg-transparent text-muted");
 
 const factLabel = "text-[0.8125rem]/[1.125rem] text-muted";
 
@@ -110,11 +111,11 @@ export function EsimCard({ esim }: { esim: Esim }) {
   }
 
   return (
-    <li className="rounded-sheet bg-brand/6 p-5 md:p-6">
+    <li className="rounded-sheet bg-ink/5 p-5 md:p-6">
       <div className="flex items-start justify-between gap-4">
         <div className="flex min-w-0 items-center gap-3.5">
           {plan?.art ? (
-            <span className="relative h-11 w-11 shrink-0 overflow-hidden rounded-full bg-brand/12">
+            <span className="relative h-11 w-11 shrink-0 overflow-hidden rounded-full bg-ink/8">
               <Image
                 src={plan.art}
                 alt=""
@@ -126,8 +127,8 @@ export function EsimCard({ esim }: { esim: Esim }) {
               />
             </span>
           ) : (
-            <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-brand/12">
-              <MdSimCard aria-hidden className="h-5 w-5 text-brand" />
+            <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-ink/8">
+              <MdSimCard aria-hidden className="h-5 w-5 text-muted" />
             </span>
           )}
 
@@ -170,7 +171,7 @@ export function EsimCard({ esim }: { esim: Esim }) {
             aria-valuenow={spent}
             aria-valuemin={0}
             aria-valuemax={100}
-            className="mt-2 h-2 overflow-hidden rounded-full bg-brand/15"
+            className="mt-2 h-2 overflow-hidden rounded-full bg-ink/10"
           >
             <div
               className={cn(
@@ -220,7 +221,10 @@ export function EsimCard({ esim }: { esim: Esim }) {
             <Pressable
               onClick={sendEmail}
               disabled={mailing || mail?.ok}
-              className={cn(mailing || mail?.ok ? quiet : secondary, "gap-2")}
+              className={cn(
+                mailing || mail?.ok ? quiet : secondary,
+                "gap-2 sm:ml-auto",
+              )}
             >
               {mail?.ok ? (
                 <MdCheck aria-hidden className="h-4 w-4" />
@@ -230,16 +234,6 @@ export function EsimCard({ esim }: { esim: Esim }) {
               {mail?.ok ? "Sent" : mailing ? "Sending…" : "Resend email"}
             </Pressable>
           </>
-        )}
-
-        {plan && (
-          <Pressable
-            href={plan.href}
-            className={cn(secondary, "gap-2 sm:ml-auto")}
-          >
-            <MdAddCircleOutline aria-hidden className="h-4 w-4" />
-            Top up {plan.destination}
-          </Pressable>
         )}
       </div>
 
