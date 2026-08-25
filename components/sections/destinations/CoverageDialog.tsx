@@ -33,9 +33,9 @@ export function CoverageDialog({
       title="Coverage"
       className="max-w-[29rem]"
     >
-      <p className="mt-2 pr-12 text-sm font-medium text-white/70">
+      <p className="mt-2 pr-12 text-sm font-medium text-muted">
         {destinationName} connects in{" "}
-        <span className="text-volt">{countries.length} countries</span> on one
+        <span className="text-brand">{countries.length} countries</span> on one
         plan
       </p>
 
@@ -44,14 +44,14 @@ export function CoverageDialog({
         onChange={setQuery}
         label="Search covered countries"
         placeholder="Where do you need internet?"
-        tone="dark"
+        tone="panel"
         className="mt-6"
       />
 
       <div
         className={cn(
           "-mx-2 mt-4 min-h-0 flex-1 px-2",
-          "scroll-subtle overflow-y-auto overscroll-contain",
+          "scroll-slim overflow-y-auto overscroll-contain",
         )}
       >
         <p aria-live="polite" className="sr-only">
@@ -59,7 +59,7 @@ export function CoverageDialog({
         </p>
 
         {results.length === 0 ? (
-          <p className="py-6 text-sm text-white/60">
+          <p className="py-6 text-sm text-muted">
             {`${query.trim()} isn’t on this plan. Try another spelling, or look for a country plan instead.`}
           </p>
         ) : (
@@ -70,14 +70,14 @@ export function CoverageDialog({
               return (
                 <li
                   key={country.name}
-                  className="flex items-center gap-3 py-2.5 text-base font-bold text-white"
+                  className="flex items-center gap-3 py-2.5 text-base font-bold"
                 >
                   <span
                     aria-hidden
                     className={cn(
                       "relative h-8 w-8 shrink-0 overflow-hidden rounded-full",
                       "flex items-center justify-center",
-                      "bg-white/10 text-xs font-bold text-white/60",
+                      "bg-brand/10 text-xs font-bold text-muted",
                     )}
                   >
                     {flag ? (

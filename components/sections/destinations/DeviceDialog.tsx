@@ -37,8 +37,8 @@ export function DeviceDialog({
       title="Check device compatibility"
       className="max-w-[29rem]"
     >
-      <p className="mt-2 pr-12 text-sm font-medium text-white/70">
-        If your device isn&rsquo;t <span className="text-volt">listed</span>, it
+      <p className="mt-2 pr-12 text-sm font-medium text-muted">
+        If your device isn&rsquo;t <span className="text-brand">listed</span>, it
         likely doesn&rsquo;t support eSIM
       </p>
 
@@ -47,18 +47,18 @@ export function DeviceDialog({
         onChange={setQuery}
         label="Search for devices"
         placeholder="Search for devices"
-        tone="dark"
+        tone="panel"
         className="mt-6"
       />
 
       <div
         className={cn(
           "-mx-2 mt-4 min-h-0 flex-1 px-2",
-          "scroll-subtle overflow-y-auto overscroll-contain",
+          "scroll-slim overflow-y-auto overscroll-contain",
         )}
       >
         {groups.length === 0 ? (
-          <p className="py-6 text-sm text-white/60">
+          <p className="py-6 text-sm text-muted">
             No device matches &ldquo;{query.trim()}&rdquo;. Check the spelling,
             or search for the model number.
           </p>
@@ -70,7 +70,7 @@ export function DeviceDialog({
               const triggerId = `${baseId}-${group.id}-trigger`;
 
               return (
-                <li key={group.id} className="rounded-control bg-white/10">
+                <li key={group.id} className="rounded-control bg-brand/6">
                   <Pressable
                     press={false}
                     id={triggerId}
@@ -83,21 +83,21 @@ export function DeviceDialog({
                     }
                     className={cn(
                       "w-full gap-4 rounded-control px-4 py-3.5 text-left",
-                      "text-base font-bold text-white",
-                      "transition-colors duration-300 ease-hover hover:bg-white/10",
+                      "text-base font-bold text-ink",
+                      "transition-colors duration-300 ease-hover hover:bg-brand/10",
                       "motion-reduce:transition-none",
                     )}
                   >
                     <span className="flex-1">{group.label}</span>
 
-                    <span className="text-sm font-medium text-white/45">
+                    <span className="text-sm font-medium text-ink/45">
                       {group.devices.length}
                     </span>
 
                     <MdExpandMore
                       aria-hidden
                       className={cn(
-                        "h-5 w-5 shrink-0 text-white/45",
+                        "h-5 w-5 shrink-0 text-ink/45",
                         "transition-transform duration-300 ease-ios",
                         isOpen && "-rotate-180",
                         "motion-reduce:transition-none",
@@ -123,11 +123,11 @@ export function DeviceDialog({
                         {group.devices.map((device) => (
                           <li
                             key={device}
-                            className="flex items-start gap-2.5 text-sm text-white/70"
+                            className="flex items-start gap-2.5 text-sm text-muted"
                           >
                             <MdCheck
                               aria-hidden
-                              className="mt-0.5 h-3.5 w-3.5 shrink-0 text-volt"
+                              className="mt-0.5 h-3.5 w-3.5 shrink-0 text-brand"
                             />
                             {device}
                           </li>

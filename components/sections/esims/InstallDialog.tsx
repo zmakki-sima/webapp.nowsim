@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import { useEffect, useState } from "react";
-import { MdCheck, MdContentCopy, MdOpenInNew } from "react-icons/md";
+import { MdCheck, MdContentCopy } from "react-icons/md";
 
 import { ConfirmIdentity } from "@/components/sections/esims/ConfirmIdentity";
 import { Dialog } from "@/components/ui/Dialog";
@@ -10,7 +10,7 @@ import { Pressable } from "@/components/ui/Pressable";
 import { cn } from "@/lib/cn";
 import type { Esim } from "@/lib/types";
 
-const row = "w-full rounded-control bg-white/10 px-4 py-3.5 text-base";
+const row = "w-full rounded-control bg-brand/6 px-4 py-3.5 text-base";
 
 function CopyRow({ label, value }: { label: string; value: string }) {
   const [copied, setCopied] = useState(false);
@@ -35,18 +35,18 @@ function CopyRow({ label, value }: { label: string; value: string }) {
   return (
     <Pressable
       onClick={copy}
-      className={cn(row, "gap-3 hover:bg-white/20 active:bg-white/20")}
+      className={cn(row, "gap-3 hover:bg-brand/12 active:bg-brand/12")}
     >
       <span className="shrink-0 font-semibold">{label}</span>
 
-      <span className="min-w-0 flex-1 truncate text-right text-white/70">
+      <span className="min-w-0 flex-1 truncate text-right text-muted">
         {value}
       </span>
 
       {copied ? (
         <MdCheck aria-hidden className="h-5 w-5 shrink-0" />
       ) : (
-        <MdContentCopy aria-hidden className="h-5 w-5 shrink-0 text-white/70" />
+        <MdContentCopy aria-hidden className="h-5 w-5 shrink-0 text-muted" />
       )}
 
       <span className="sr-only">
@@ -77,7 +77,7 @@ export function InstallDialog({
 
   return (
     <Dialog open={open} onClose={onClose} title={title}>
-      <div className="mt-6 flex flex-col gap-4 overflow-y-auto scroll-subtle">
+      <div className="mt-6 flex flex-col gap-4 overflow-y-auto scroll-slim">
         {esim.qrImage ? (
           <div className="flex flex-col items-center gap-3">
             <div className="rounded-card bg-white p-3">
@@ -91,13 +91,14 @@ export function InstallDialog({
               />
             </div>
 
-            <p className="text-center text-sm text-white/70">
-              Scan this from the phone that will use the eSIM. It can only be
-              installed once.
+            <p className="text-center text-sm text-muted">
+              Scan this from the phone that will use the eSIM.
+              <br />
+              It can only be installed once.
             </p>
           </div>
         ) : (
-          <p className="text-sm text-white/70">
+          <p className="text-sm text-muted">
             This eSIM has no installation code left. Buy a new plan to get
             another one.
           </p>
@@ -109,13 +110,12 @@ export function InstallDialog({
             target="_blank"
             rel="noreferrer"
             className={cn(
-              "w-full gap-2 rounded-control bg-white px-5 py-3.5",
-              "text-base font-bold text-ink",
-              "hover:bg-white/85 active:bg-white/85",
+              "w-full gap-2 rounded-control bg-brand px-5 py-3.5",
+              "text-base font-bold text-white",
+              "hover:bg-brand-soft active:bg-brand-soft",
             )}
           >
             Install on this iPhone
-            <MdOpenInNew aria-hidden className="h-4 w-4" />
           </Pressable>
         )}
 

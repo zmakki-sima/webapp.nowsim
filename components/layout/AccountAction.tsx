@@ -33,31 +33,37 @@ export function AccountActionFallback() {
   );
 }
 
-const row = "w-full rounded-control bg-white/10 px-4 py-3.5 text-base";
+const row = "w-full rounded-control bg-brand/6 px-4 py-3.5 text-base";
 
 const menuBase = cn(
   "w-full justify-between gap-3 rounded-control px-4 py-3.5",
   "text-left text-base",
 );
 
+/*
+ * Plain `hover:`, not `enabled:hover:` — half these rows are links, and
+ * `:enabled` only ever matches form controls, so the anchors silently lost
+ * their hover. A disabled Pressable already takes `pointer-events-none`.
+ */
 const menuItem = cn(
   menuBase,
   "font-semibold",
-  "bg-white/10 enabled:hover:bg-white/20 enabled:active:bg-white/20",
+  "bg-ink-deep/8 text-ink-deep",
+  "hover:bg-ink-deep/15 active:bg-ink-deep/15",
 );
 
-const menuWhite = cn(
+const menuPrimary = cn(
   menuBase,
   "font-semibold",
-  "bg-white text-ink",
-  "enabled:hover:bg-white/85 enabled:active:bg-white/85",
+  "bg-brand text-white",
+  "hover:bg-brand-soft active:bg-brand-soft",
 );
 
 const menuLeave = cn(
   menuBase,
   "font-bold",
-  "bg-danger/20 text-danger",
-  "enabled:hover:bg-danger/30 enabled:active:bg-danger/30",
+  "bg-danger/12 text-danger",
+  "hover:bg-danger/20 active:bg-danger/20",
 );
 
 const menuLabel = "flex min-w-0 items-center gap-3";
@@ -85,18 +91,18 @@ function CopyId({ userId }: { userId: string }) {
   return (
     <Pressable
       onClick={copy}
-      className={cn(row, "gap-3 hover:bg-white/20 active:bg-white/20")}
+      className={cn(row, "gap-3 hover:bg-brand/12 active:bg-brand/12")}
     >
       <span className="shrink-0 font-semibold">Yesim User ID</span>
 
-      <span className="min-w-0 flex-1 truncate text-right text-white/70">
+      <span className="min-w-0 flex-1 truncate text-right text-muted">
         {userId}
       </span>
 
       {copied ? (
         <MdCheck aria-hidden className="h-5 w-5 shrink-0" />
       ) : (
-        <MdContentCopy aria-hidden className="h-5 w-5 shrink-0 text-white/70" />
+        <MdContentCopy aria-hidden className="h-5 w-5 shrink-0 text-muted" />
       )}
 
       <span className="sr-only">
@@ -177,7 +183,7 @@ export function AccountAction() {
             <Pressable
               href="/esims"
               onClick={close}
-              className={cn(menuWhite, "hover:bg-white/85 active:bg-white/85")}
+              className={menuPrimary}
             >
               <span className={menuLabel}>
                 <MdSimCard aria-hidden className="h-5 w-5 shrink-0" />
@@ -204,7 +210,7 @@ export function AccountAction() {
             <Pressable
               href="/purchases"
               onClick={close}
-              className={cn(menuItem, "hover:bg-white/20 active:bg-white/20")}
+              className={menuItem}
             >
               <span className={menuLabel}>
                 <MdReceiptLong aria-hidden className="h-5 w-5 shrink-0" />
@@ -231,11 +237,11 @@ export function AccountAction() {
         title="Account"
       >
         <div className={cn(row, "mt-6 flex items-center gap-3")}>
-          <MdPerson aria-hidden className="h-5 w-5 shrink-0 text-white/55" />
+          <MdPerson aria-hidden className="h-5 w-5 shrink-0 text-muted" />
           <p className="min-w-0 flex-1 truncate">{account.email}</p>
         </div>
 
-        <p className="mt-2 text-sm text-white/55">
+        <p className="mt-2 text-sm text-muted">
           Signed in via {providerNames[account.provider]}. Your eSIM, QR code
           and receipt go to this address.
         </p>
@@ -247,7 +253,7 @@ export function AccountAction() {
         <Pressable
           className={cn(
             "mt-6 w-full rounded-control px-5 py-3.5 text-base font-bold",
-            "bg-danger/20 text-danger hover:bg-danger/30 active:bg-danger/30",
+            "bg-danger/12 text-danger hover:bg-danger/20 active:bg-danger/20",
           )}
         >
           Delete account

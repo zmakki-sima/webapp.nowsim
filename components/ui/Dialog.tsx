@@ -27,6 +27,7 @@ export function Dialog({
   onClose,
   onBack,
   title,
+  width = "max-w-[27rem]",
   className,
   children,
 }: {
@@ -34,6 +35,8 @@ export function Dialog({
   onClose: () => void;
   onBack?: () => void;
   title: ReactNode;
+  /** Panel width cap. Replaces the default rather than layering on top of it. */
+  width?: string;
   className?: string;
   children: ReactNode;
 }) {
@@ -105,7 +108,8 @@ export function Dialog({
         onClick={onClose}
         className={cn(
           "absolute inset-0 cursor-default",
-          "bg-ink/45 backdrop-blur-md backdrop-saturate-150",
+          // Plain darkening, no blur: the page behind stays readable as itself.
+          "bg-black/55",
           "transition-opacity duration-150 ease-out",
           open ? "opacity-100" : "opacity-0",
           "motion-reduce:transition-none",
@@ -118,7 +122,8 @@ export function Dialog({
         aria-modal="true"
         aria-labelledby={titleId}
         className={cn(
-          "relative w-full max-w-[27rem]",
+          "relative w-full",
+          width,
           "transition-[transform,opacity] duration-300",
           open
             ? "scale-100 opacity-100 ease-pop"
@@ -130,7 +135,8 @@ export function Dialog({
         <div
           className={cn(
             "relative flex max-h-[85dvh] flex-col rounded-sheet",
-            "bg-ink p-7 text-white shadow-2xl shadow-ink/30 md:p-8",
+            "bg-surface p-7 text-ink md:p-8",
+            "border border-hairline shadow-2xl shadow-ink/20",
           )}
         >
           <Pressable
@@ -139,8 +145,8 @@ export function Dialog({
               "absolute right-4 top-4 h-9 w-9 rounded-full",
               "after:absolute after:left-1/2 after:top-1/2 after:content-['']",
               "after:h-11 after:w-11 after:-translate-x-1/2 after:-translate-y-1/2",
-              "bg-white/10 text-white/70",
-              "hover:bg-white/20 hover:text-white active:bg-white/20",
+              "bg-brand/8 text-muted",
+              "hover:bg-brand/15 hover:text-brand active:bg-brand/15",
             )}
           >
             {onBack ? (
