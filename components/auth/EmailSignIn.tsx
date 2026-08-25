@@ -26,18 +26,6 @@ export type SignInTone = {
   clear: string;
 };
 
-export const darkTone: SignInTone = {
-  fieldIdle: "border-transparent bg-white/10 text-white placeholder:text-white/40",
-  fieldError: "border-danger/60 bg-danger/10 text-white placeholder:text-white/40",
-  primary: "bg-white text-ink hover:bg-white/85 active:bg-white/85",
-  secondary: "bg-white/10 text-white hover:bg-white/20 active:bg-white/20",
-  inert: "bg-white/5 text-white/35",
-  helper: "text-white/55",
-  error: "text-danger",
-  change: "bg-white/10 text-volt hover:bg-white/20 active:bg-white/20",
-  clear: "text-white/50 hover:text-white active:text-white",
-};
-
 export const lightTone: SignInTone = {
   fieldIdle: "border-hairline bg-surface text-ink placeholder:text-muted",
   fieldError: "border-danger bg-danger/5 text-ink placeholder:text-muted",

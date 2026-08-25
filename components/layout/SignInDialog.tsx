@@ -3,7 +3,7 @@
 import { useRouter } from "next/navigation";
 import { useCallback, useState } from "react";
 
-import { darkTone, EmailSignIn } from "@/components/auth/EmailSignIn";
+import { EmailSignIn, lightTone } from "@/components/auth/EmailSignIn";
 import { Dialog } from "@/components/ui/Dialog";
 import { Pressable } from "@/components/ui/Pressable";
 import { authProviders, legalLinks } from "@/lib/auth/providers";
@@ -11,11 +11,14 @@ import { cn } from "@/lib/cn";
 
 const providers = authProviders;
 
-const tone = "bg-white/10 text-white hover:bg-white/20 active:bg-white/20";
+const tone = cn(
+  "border border-hairline text-ink",
+  "hover:border-brand/35 hover:bg-brand/6 active:bg-brand/10",
+);
 
 function Legal() {
   return (
-    <p className="mt-6 text-center text-xs leading-relaxed text-white/45">
+    <p className="mt-6 text-center text-xs leading-relaxed text-muted">
       By clicking &ldquo;Continue&rdquo;, you agree to our{" "}
       {legalLinks.map((item, index) => (
         <span key={item.label}>
@@ -23,8 +26,8 @@ function Legal() {
             href={item.href}
             press={false}
             className={cn(
-              "inline font-bold text-white/70 underline underline-offset-2",
-              "transition-colors duration-300 ease-hover hover:text-volt",
+              "inline font-bold text-ink underline underline-offset-2",
+              "transition-colors duration-300 ease-hover hover:text-brand",
               "motion-reduce:transition-none",
             )}
           >
@@ -72,7 +75,7 @@ export function SignInDialog({
       {email ? (
         <div className="mt-6">
           <EmailSignIn
-            tone={darkTone}
+            tone={lightTone}
             onCancel={onClose}
             onSignedIn={done}
           />

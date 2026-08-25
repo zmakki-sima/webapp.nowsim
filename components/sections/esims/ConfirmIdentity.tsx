@@ -5,14 +5,14 @@ import { useActionState, useEffect, useState } from "react";
 import { MdLockOutline } from "react-icons/md";
 
 import { confirmReauth, requestReauth, type ReauthState } from "@/app/actions/auth";
-import { darkTone } from "@/components/auth/EmailSignIn";
+import { lightTone } from "@/components/auth/EmailSignIn";
 import { Pressable } from "@/components/ui/Pressable";
 import { cn } from "@/lib/cn";
 
 const field = cn(
   "w-full rounded-control border px-5 py-3.5",
   "text-base font-medium",
-  "focus:outline-none",
+  "focus:border-brand/30 focus:outline-none",
   "transition-colors duration-300 ease-hover motion-reduce:transition-none",
 );
 
@@ -45,11 +45,16 @@ export function ConfirmIdentity() {
   if (!sent?.sent) {
     return (
       <div className="flex flex-col items-center gap-4 py-2 text-center">
-        <MdLockOutline aria-hidden className="h-8 w-8 text-white/70" />
+        <span
+          aria-hidden
+          className="flex h-14 w-14 items-center justify-center rounded-full bg-brand/12 text-brand"
+        >
+          <MdLockOutline className="h-7 w-7" />
+        </span>
 
-        <p className="text-sm text-white/70">
+        <p className="text-sm text-muted">
           Anyone with the activation code can install this eSIM, so we check it
-          is you before showing it. We will email you a code.
+          is you before showing it.
         </p>
 
         <Pressable
@@ -57,14 +62,14 @@ export function ConfirmIdentity() {
           disabled={sending}
           className={cn(
             button,
-            sending ? "bg-white/10 text-white/40" : "bg-white text-ink hover:bg-white/85",
+            sending ? lightTone.inert : lightTone.primary,
           )}
         >
           {sending ? "Sending…" : "Email me a code"}
         </Pressable>
 
         {error ? (
-          <p role="alert" className={cn("text-sm font-medium", darkTone.error)}>
+          <p role="alert" className={cn("text-sm font-medium", lightTone.error)}>
             {error}
           </p>
         ) : null}
@@ -88,27 +93,27 @@ export function ConfirmIdentity() {
         onChange={(event) =>
           setCode(event.target.value.replace(/\D/g, "").slice(0, 6))
         }
-        className={cn(field, error ? darkTone.fieldError : darkTone.fieldIdle)}
+        className={cn(field, error ? lightTone.fieldError : lightTone.fieldIdle)}
       />
 
       <p
         role={error ? "alert" : undefined}
         className={cn(
           "text-sm",
-          error ? cn("font-medium", darkTone.error) : darkTone.helper,
+          error ? cn("font-medium", lightTone.error) : lightTone.helper,
         )}
       >
         {error ?? "Your authorization code has been sent to your email"}
       </p>
 
-      {code !== "" ? (
+      {code.length === 6 ? (
         <Pressable
           type="submit"
           disabled={pending}
           className={cn(
             button,
             "mt-1",
-            pending ? "bg-white/10 text-white/40" : "bg-white text-ink hover:bg-white/85",
+            pending ? lightTone.inert : lightTone.primary,
           )}
         >
           {pending ? "Checking…" : "Show install details"}

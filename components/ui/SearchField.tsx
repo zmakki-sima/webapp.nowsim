@@ -7,9 +7,9 @@ import { Pressable } from "@/components/ui/Pressable";
 import { cn } from "@/lib/cn";
 
 /**
- * Two surfaces carry a search field: the pages, which are light, and the
- * dialogs, which sit on the dark sheet. Both share the shape and the focus
- * behaviour; only the palette and the density differ.
+ * Two surfaces carry a search field: the pages, which have room for it, and the
+ * dialogs, which do not. Both are white and both share the focus behaviour;
+ * only the density and the weight of the fill differ.
  */
 const tones = {
   light: {
@@ -32,23 +32,23 @@ const tones = {
     clear: "hover:bg-brand/8 hover:text-brand active:bg-brand/8",
     glow: true,
   },
-  dark: {
+  panel: {
     icon: cn(
-      "h-4 w-4 text-white/45 transition-colors duration-300 ease-hover",
-      "group-focus-within:text-volt motion-reduce:transition-none",
+      "h-4 w-4 text-ink/40 transition-colors duration-300 ease-hover",
+      "group-focus-within:text-brand motion-reduce:transition-none",
     ),
     iconSide: { left: "left-4", right: "right-4" },
     input: cn(
-      "rounded-control bg-white/10 py-3.5",
-      "text-base text-white placeholder:text-white/45",
+      "rounded-control bg-brand/6 py-3.5",
+      "text-base text-ink placeholder:text-ink/40",
       "outline-none transition-colors duration-300 ease-hover",
-      "hover:bg-white/[0.14] focus:bg-white/[0.14]",
-      "focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-volt",
+      "hover:bg-brand/10 focus:bg-brand/10",
+      "focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand",
     ),
     padIcon: { left: "pl-11", right: "pr-11" },
     padPlain: { left: "pl-4", right: "pr-4" },
     padClear: "pr-12",
-    clear: "hover:bg-white/10 hover:text-volt active:bg-white/10",
+    clear: "hover:bg-brand/10 hover:text-brand active:bg-brand/10",
     glow: false,
   },
 } as const;
