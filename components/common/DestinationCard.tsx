@@ -2,8 +2,8 @@ import Image from "next/image";
 
 import { MdChevronRight } from "react-icons/md";
 
+import { Price } from "@/components/common/Price";
 import { Pressable } from "@/components/ui/Pressable";
-import { formatMoney } from "@/lib/money";
 import { destinationHref, type DestinationSummary } from "@/lib/types";
 import { cn } from "@/lib/cn";
 
@@ -40,7 +40,7 @@ export function DestinationCard({
           {destination.name}
         </span>
         <span className="block text-sm font-medium text-muted">
-          From {formatMoney(destination.from)}
+          From <Price money={destination.from} />
           {destination.covers ? ` • ${destination.covers} countries` : ""}
         </span>
 

@@ -27,10 +27,17 @@ is built.
 `Plan.id` is the API's 32-char hex id and is **the value `/new_esim` needs**. It must
 survive into the order.
 
+`/issue_esim` is Yesim's bulk endpoint. **It does not work and is scrapped.**
+`/new_esim` is the only provisioning call: one call, one eSIM. A quantity of `n`
+is `n` calls. Adding a plan to a card the customer already owns is a separate
+add-plan-by-ICCID endpoint that **overwrites** the plan on that card.
+
 ### Answer before starting payments
 
-- [ ] `/new_esim` vs `/issue_esim`. Which provisions, and what does each return?
+- [ ] Exact parameters and response shape for `/new_esim` and for add-plan-by-ICCID.
 - [ ] Does Yesim email the QR itself, or must we?
+- [ ] What a failure looks like: an HTTP error, or a `200` carrying an error field?
+- [ ] Does a repeated `/new_esim` with the same values double-charge us?
 - [ ] Is `/balance` a prepaid float that can run dry, or post-paid invoicing?
 
 ---

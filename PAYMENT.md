@@ -125,7 +125,7 @@ Roughly nine pieces. Each is small.
    - reply `200` fast; do the slow work carefully (see §7).
 6. **Fulfilment** — the piece that turns a paid order into a delivered eSIM: call Yesim's purchase endpoint, then `sendEsimEmail` ([`lib/mail/esim.ts:699`](lib/mail/esim.ts)). **This is the part still missing its spec — see §12.**
 7. **An order record** — a small row per order so we can answer "did this get delivered?" Redis is already a dependency (`@upstash/redis`, used by auth). Store: Stripe session id, account, plan, amount, status (`pending` → `paid` → `fulfilled` / `failed`), the Yesim result, timestamps.
-8. **Success and cancel pages** — `/checkout/success` reads the order record and shows real status; `/checkout/cancel` (or return to checkout) for abandonment.
+8. **Success and cancel pages** — `/checkout/success` reads the order record and shows real status; `/checkout/failed` is Stripe's `cancel_url`, and offers the same checkout back (the order record stores the query string that rebuilds it).
 9. **Alerting** — if fulfilment fails after payment, a human must find out in minutes, not from an angry customer.
 
 ---
@@ -247,23 +247,59 @@ Phases 1–3 can start immediately. Phase 4 cannot.
 
 ---
 
-## 12. Open questions — answers needed before code
+## 12. Provisioning — decided
 
-Four are blocking. Please get these answered.
+Confirmed by the account owner. Not open questions any more.
 
-1. **🔴 Yesim purchase contract (blocks phase 4).** We currently only *read* from Yesim — plans, orders, eSIMs. Nothing anywhere in the codebase buys one. Needed from Yesim:
-   - the exact endpoint and parameters to buy a plan for a given user;
-   - what it returns (ICCID, activation code, QR);
-   - whether calling it twice with the same reference is safe, or whether it double-charges;
-   - **how we are billed** — is our partner balance debited at purchase time? If so, a low balance means paid customers get no eSIM, and balance monitoring becomes mandatory.
-2. **🔴 Currency mismatch.** Your Stripe account is in **CHF**. Our catalog prices are **EUR or USD** ([`lib/money.ts:1`](lib/money.ts)). Charging EUR into a CHF account works, but Stripe converts at their rate and takes a conversion fee, so payouts will not match the sticker price. Decide: sell in CHF, or accept the conversion, or add a second settlement currency.
-3. **🟡 Stripe Connect.** Your dashboard shows Connect enabled, connected accounts, and CHF 100 of Connect payment volume, under an account named **Swan sandbox**. Connect means money is being routed to *other* accounts. If nowsim's payments must flow through a connected account or a platform, the setup changes materially. Confirm whether this account is meant to be a plain merchant account or part of a Connect platform — and whether the Swan account is even the right one to use.
-4. **🟡 Guest checkout.** Today the Pay button is locked until sign-in. Keep it that way for launch — it gives us a Yesim user id and an email to deliver to. Confirm.
-5. **🟢 Refund policy.** eSIMs are hard to "return" once activated. Written policy needed: refundable before activation, not after? Partial? This feeds both the Terms and the automatic-refund logic.
-6. **🟢 Alert channel.** Where should "paid but not delivered" alerts land — email, Slack, something else?
+**`new_esim` is the only provisioning call.** It creates one eSIM with one plan
+attached. `issue_esim` is Yesim's bulk endpoint, it does not work, and it is
+scrapped — it must not appear anywhere in the codebase.
+
+**Quantity `n` means `n` separate `new_esim` calls.** There is no bulk path. Each
+call yields its own card, so the order record tracks them individually: if call 2
+of 3 fails, one eSIM was delivered and two are owed, and the refund is for two —
+not for the whole order.
+
+**Adding a plan to an eSIM the customer already owns** uses a separate
+add-plan-by-ICCID endpoint. It **overwrites** whatever plan is on that card,
+including any data still left on it. The upside is that the customer skips
+installation entirely — the profile is already on their phone. Expired cards are
+valid targets; a removed one is not.
+
+**The customer picks new-vs-existing before paying, not after.** By the time the
+webhook runs they are long gone, so the choice is captured at checkout and
+carried in the Stripe session metadata. Built in
+[`InstallChoiceDialog.tsx`](components/sections/checkout/InstallChoiceDialog.tsx),
+opened by the Pay button, fed by the `listInstallTargets` server action
+([`app/actions/checkout.ts`](app/actions/checkout.ts)).
+
+**Adding to an existing eSIM is a quantity-of-one operation.** One card cannot be
+overwritten three times, so orders above one eSIM skip the dialog and always
+issue new cards.
+
+**Everything is priced in EUR.** All 1520 plans in the live catalog return `EUR`;
+`USD` survives only as an unused branch in [`lib/money.ts:1`](lib/money.ts) and
+[`lib/api/schemas.ts:3`](lib/api/schemas.ts). When it is removed, a stray non-EUR
+plan must be dropped from the catalog rather than failing the parse — otherwise
+one bad plan takes the whole site down.
+
+Still needed from Yesim's documentation before phase 4: exact parameters and
+response shape for both calls, whether Yesim emails the QR itself, what a failure
+looks like on the wire (HTTP status versus a `200` carrying an error), whether a
+repeated call double-charges us, and whether `/balance` is a prepaid float.
 
 ---
 
-## 13. What this does *not* cover
+## 13. Open questions — answers needed before code
 
-Deliberately out of scope for launch: saved cards, subscriptions or auto-renew (the page explicitly promises none — [`PaymentStep.tsx:76`](components/sections/checkout/PaymentStep.tsx)), promo codes, multi-currency pricing, invoicing, and the embedded Payment Element. Each is additive later.
+1. **🔴 Currency settlement.** The Stripe account is in **CHF**, prices are **EUR**. Charging EUR into a CHF account works, but Stripe converts at their rate and takes a fee, so payouts will not match the sticker price. Decide: sell in CHF, accept the conversion, or add EUR as a second settlement currency.
+2. **🟡 Stripe Connect.** Your dashboard shows Connect enabled, connected accounts, and CHF 100 of Connect payment volume, under an account named **Swan sandbox**. Connect means money is being routed to *other* accounts. If nowsim's payments must flow through a connected account or a platform, the setup changes materially. Confirm whether this account is meant to be a plain merchant account or part of a Connect platform — and whether the Swan account is even the right one to use.
+3. **🟡 Guest checkout.** Today the Pay button is locked until sign-in. Keep it that way for launch — it gives us a Yesim user id and an email to deliver to. Confirm.
+4. **🟢 Refund policy.** eSIMs are hard to "return" once activated. Written policy needed: refundable before activation, not after? Partial? This feeds both the Terms and the automatic-refund logic.
+5. **🟢 Alert channel.** Where should "paid but not delivered" alerts land — email, Slack, something else?
+
+---
+
+## 14. What this does *not* cover
+
+Deliberately out of scope for launch: saved cards, subscriptions or auto-renew (the page explicitly promises none — [`PaymentStep.tsx`](components/sections/checkout/PaymentStep.tsx)), promo codes, multi-currency pricing, invoicing, and the embedded Payment Element. Each is additive later.

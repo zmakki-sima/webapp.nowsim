@@ -1,7 +1,7 @@
 import Image from "next/image";
 
+import { Price } from "@/components/common/Price";
 import { Pressable } from "@/components/ui/Pressable";
-import { formatMoney } from "@/lib/money";
 import type { Order } from "@/lib/order";
 import { destinationHref } from "@/lib/types";
 import { cn } from "@/lib/cn";
@@ -9,7 +9,9 @@ import { cn } from "@/lib/cn";
 const line = "flex items-baseline justify-between gap-4 text-sm";
 
 export function OrderSummary({ order }: { order: Order }) {
-  const { destination, plan, quantity, unitPrice, total } = order;
+  // The total is derived from the converted unit price rather than read off the
+  // order, so the line above and the charge on the card agree in every currency.
+  const { destination, plan, quantity, unitPrice } = order;
 
   return (
     <div className="rounded-sheet bg-surface-soft p-6 md:p-8">
@@ -41,10 +43,12 @@ export function OrderSummary({ order }: { order: Order }) {
       <dl className="mt-6 flex flex-col gap-3 border-t border-hairline pt-6">
         <div className={line}>
           <dt className="text-muted">
-            {formatMoney(unitPrice)} &times; {quantity} eSIM
+            <Price money={unitPrice} /> &times; {quantity} eSIM
             {quantity > 1 ? "s" : ""}
           </dt>
-          <dd className="font-bold">{formatMoney(total)}</dd>
+          <dd className="font-bold">
+            <Price money={unitPrice} times={quantity} />
+          </dd>
         </div>
 
         <div className={line}>
@@ -60,7 +64,9 @@ export function OrderSummary({ order }: { order: Order }) {
 
       <div className="mt-6 flex items-baseline justify-between gap-4 border-t border-hairline pt-6">
         <p className="text-base font-bold">Total</p>
-        <p className="text-h3 font-bold tracking-[-0.02em]">{formatMoney(total)}</p>
+        <p className="text-h3 font-bold tracking-[-0.02em]">
+          <Price money={unitPrice} times={quantity} />
+        </p>
       </div>
 
       <p className="mt-6 text-sm leading-relaxed text-muted">

@@ -9,6 +9,7 @@ import {
   AccountAction,
   AccountActionFallback,
 } from "@/components/layout/AccountAction";
+import { CurrencyMenu } from "@/components/layout/CurrencyMenu";
 import { cn } from "@/lib/cn";
 
 import { MenuPanel, MenuToggle } from "@/components/layout/MobileMenu";
@@ -132,7 +133,9 @@ export function WebNavbar() {
                 </ul>
               </nav>
 
-              <div className="flex items-center gap-3 md:gap-4">
+              <div className="flex items-center gap-2 md:gap-3">
+                <CurrencyMenu />
+
                 <Suspense fallback={<AccountActionFallback />}>
                   <AccountAction />
                 </Suspense>

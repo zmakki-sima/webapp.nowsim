@@ -18,3 +18,19 @@ const day = new Intl.DateTimeFormat("en-US", {
 export function formatDay(iso: string): string {
   return day.format(new Date(iso));
 }
+
+const slashDay = new Intl.DateTimeFormat("en-GB", {
+  day: "2-digit",
+  month: "short",
+  year: "numeric",
+  timeZone: "UTC",
+});
+
+/** `12/Dec/2026`. Assembled from parts because no locale separates with slashes. */
+export function formatSlashDay(iso: string): string {
+  const parts = slashDay.formatToParts(new Date(iso));
+  const part = (type: Intl.DateTimeFormatPartTypes) =>
+    parts.find((entry) => entry.type === type)?.value ?? "";
+
+  return `${part("day")}/${part("month")}/${part("year")}`;
+}

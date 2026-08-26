@@ -87,6 +87,30 @@ const esimSchema = z.object({
 
 export type ApiEsim = z.infer<typeof esimSchema>;
 
+/**
+ * `new_esim`. Documented as returning the eSIM it just created, without the `id`
+ * that `user` reports, and without `img` — the QR *image* is only available by
+ * reading the eSIM back afterwards.
+ *
+ * `iccid` is the one field required to be present and non-empty. The upstream
+ * does not document what a failure looks like, so a reply that fails to name a
+ * card is treated as one rather than assumed to be success.
+ */
+export const newEsimResponseSchema = z.object({
+  iccid: z.string().min(1),
+  created_at: z.string().nullish(),
+  active_plan_id: id.nullish(),
+  plan_activated_at: z.string().nullish(),
+  plan_expired_at: z.string().nullish(),
+  qrcode: z.string().nullish(),
+  status_qr: z.string().nullish(),
+  imsi: z.string().nullish(),
+  msisdn: z.string().nullish(),
+  is_deleted: z.union([z.string(), z.number()]).nullish(),
+  ios_tap_link: z.string().nullish(),
+  esim_passport: z.string().nullish(),
+});
+
 export const userResponseSchema = z.object({
   id,
   email: z.string().default(""),
