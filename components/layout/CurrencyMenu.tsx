@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { useEffect, useId, useRef, useState } from "react";
 import { MdCheck, MdExpandMore } from "react-icons/md";
 
@@ -19,6 +20,35 @@ const option = cn(
   "text-left text-base",
   "hover:bg-brand/8 active:bg-brand/12",
 );
+
+/**
+ * The flags are square rather than the usual 3:2 so that the circular crop
+ * takes the middle of the design instead of shaving the hoist off, which is
+ * where Bahrain's serration and the UAE's red bar live.
+ */
+function Flag({ currency, className }: { currency: Currency; className?: string }) {
+  return (
+    <span
+      aria-hidden
+      className={cn(
+        "relative shrink-0 overflow-hidden rounded-full",
+        "ring-1 ring-inset ring-ink/10",
+        className,
+      )}
+    >
+      <Image
+        src={`/images/flags/${currency.toLowerCase()}.svg`}
+        alt=""
+        fill
+        sizes="24px"
+        // As everywhere else in the app: `dangerouslyAllowSVG` is off, so the
+        // optimizer refuses an SVG source and the image has to be served as-is.
+        unoptimized
+        className="object-cover"
+      />
+    </span>
+  );
+}
 
 export function CurrencyMenu() {
   const active = useCurrency();
@@ -69,7 +99,7 @@ export function CurrencyMenu() {
         onClick={() => setOpen((value) => !value)}
         className={trigger}
       >
-        <span aria-hidden>{currencies[active].symbol}</span>
+        <Flag currency={active} className="h-5 w-5" />
         <span className="font-semibold">{active}</span>
         <MdExpandMore
           aria-hidden
@@ -91,7 +121,7 @@ export function CurrencyMenu() {
         inert={!open}
         className={cn(
           "absolute right-0 top-full z-[58] mt-2 w-40 p-2",
-          "rounded-sheet text-ink",
+          "rounded-card text-ink",
           "border border-white/60 bg-white/90 backdrop-blur-xl backdrop-saturate-150",
           "shadow-lg shadow-ink/10",
           "origin-top-right transition-[transform,opacity,visibility]",
@@ -111,6 +141,7 @@ export function CurrencyMenu() {
                 onClick={() => choose(code)}
                 className={cn(option, code === active && "bg-brand/8")}
               >
+                <Flag currency={code} className="h-6 w-6" />
                 <span className="min-w-0 flex-1 font-semibold">{code}</span>
 
                 {code === active ? (

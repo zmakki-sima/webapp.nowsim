@@ -48,7 +48,10 @@ const button = cn(
 const field = cn(
   "w-full rounded-control border px-5 py-3.5",
   "text-base font-medium",
-  "focus:outline-none",
+  // Matches the authorization-code field on the eSIMs page: the brand tint on
+  // the border replaces the UA focus ring, so `outline-none` is only safe
+  // alongside it.
+  "focus:border-brand/30 focus:outline-none",
   "transition-colors duration-300 ease-hover motion-reduce:transition-none",
 );
 

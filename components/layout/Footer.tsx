@@ -108,7 +108,7 @@ export async function Footer() {
             <div>
               <h2 className="text-h3">
                 Download nowsim for your{" "}
-                <span className="text-volt">next journey</span>
+                <span className="text-brand-invert">next journey</span>
               </h2>
 
               <p className="mt-3 max-w-[52ch] text-base text-muted-invert">
@@ -171,7 +171,7 @@ export async function Footer() {
             <div className="flex flex-wrap gap-x-12 gap-y-8 md:shrink-0">
               {groups.map((group) => (
                 <div key={group.title} className="min-w-36">
-                  <h3 className="text-eyebrow uppercase text-volt">
+                  <h3 className="text-eyebrow uppercase text-brand-invert">
                     {group.title}
                   </h3>
 

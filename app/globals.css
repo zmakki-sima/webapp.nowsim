@@ -11,6 +11,8 @@
   /* Hover/press pair for filled brand controls, mirroring ink-soft/ink-deep. */
   --color-brand-soft: color-mix(in srgb, var(--color-brand) 88%, #ffffff);
   --color-brand-deep: color-mix(in srgb, var(--color-brand) 82%, var(--color-ink));
+  /* Brand accent lifted for text on ink — #5f47eb itself is too dark to read there. */
+  --color-brand-invert: #a99bf5;
 
   --color-surface: #ffffff;
   /* Soft surfaces carry a brand tint, not grey — the house theme is purple. */

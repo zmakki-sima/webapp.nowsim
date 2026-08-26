@@ -145,8 +145,8 @@ export function Dialog({
               "absolute right-4 top-4 h-9 w-9 rounded-full",
               "after:absolute after:left-1/2 after:top-1/2 after:content-['']",
               "after:h-11 after:w-11 after:-translate-x-1/2 after:-translate-y-1/2",
-              "bg-brand/8 text-muted",
-              "hover:bg-brand/15 hover:text-brand active:bg-brand/15",
+              "bg-brand/8 text-brand",
+              "hover:bg-brand/15 active:bg-brand/15",
             )}
           >
             {onBack ? (

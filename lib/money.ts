@@ -33,21 +33,13 @@ type CurrencyFacts = {
   step: number;
   /** Spoken name, for the currency menu. */
   label: string;
-  /** Short mark, for the currency menu's trigger. */
-  symbol: string;
 };
 
 export const currencies: Record<Currency, CurrencyFacts> = {
-  EUR: { decimals: 2, rate: 1, step: 1, label: "Euro", symbol: "€" },
-  USD: { decimals: 2, rate: 1.08, step: 1, label: "US Dollar", symbol: "$" },
-  BHD: {
-    decimals: 3,
-    rate: 0.41,
-    step: 10,
-    label: "Bahraini Dinar",
-    symbol: "BD",
-  },
-  AED: { decimals: 2, rate: 3.97, step: 1, label: "UAE Dirham", symbol: "AED" },
+  EUR: { decimals: 2, rate: 1, step: 1, label: "Euro" },
+  USD: { decimals: 2, rate: 1.08, step: 1, label: "US Dollar" },
+  BHD: { decimals: 3, rate: 0.41, step: 10, label: "Bahraini Dinar" },
+  AED: { decimals: 2, rate: 3.97, step: 1, label: "UAE Dirham" },
 };
 
 export function isCurrency(value: unknown): value is Currency {
@@ -97,6 +89,35 @@ function formatterFor(currency: Currency): Intl.NumberFormat {
   return formatter;
 }
 
+/**
+ * `en-US` puts the euro and dollar signs in front of the digits but writes the
+ * dinar and dirham as a leading code — `BHD 12.346`. Prices sit next to each
+ * other in the catalog, so the mark is moved after the number for those two and
+ * every price lines up on its first digit whichever currency is selected.
+ *
+ * Only the currency part is moved: the grouping and the decimal count still
+ * come from `Intl`, which is what keeps the dinar at three places.
+ */
 export function formatMoney({ amount, currency }: Money): string {
-  return formatterFor(currency).format(amount / minorUnits(currency));
+  const parts = formatterFor(currency).formatToParts(amount / minorUnits(currency));
+
+  // Not necessarily index 0: a negative amount puts the minus sign first, and
+  // the sign has to stay in front of the digits when the code moves behind them.
+  const at = parts.findIndex((part) => part.type === "currency");
+
+  // A *symbol* (€, $) is left where it is; only an alphabetic code is moved,
+  // which is the form the dinar and dirham take.
+  const moves =
+    at !== -1 &&
+    /^\p{L}+$/u.test(parts[at].value) &&
+    parts.slice(0, at).every((part) => part.type !== "integer");
+
+  if (!moves) return parts.map((part) => part.value).join("");
+
+  const mark = parts[at].value;
+  // Drop the separator the formatter put between the code and the digits.
+  const gap = parts[at + 1]?.type === "literal" ? 2 : 1;
+  const rest = [...parts.slice(0, at), ...parts.slice(at + gap)];
+
+  return `${rest.map((part) => part.value).join("")} ${mark}`;
 }

@@ -11,15 +11,18 @@ import { cn } from "@/lib/cn";
 
 const providers = authProviders;
 
-const tone = cn(
-  "border border-hairline text-ink",
-  "hover:border-brand/35 hover:bg-brand/6 active:bg-brand/10",
-);
+const tone = lightTone.primary;
 
 function Legal() {
   return (
     <p className="mt-6 text-center text-xs leading-relaxed text-muted">
-      By clicking &ldquo;Continue&rdquo;, you agree to our{" "}
+      {/*
+        Broken deliberately after &ldquo;to&rdquo; so the sentence does not wrap
+        mid-phrase: &ldquo;our&rdquo; stays on the second line with the two
+        policy links it introduces.
+      */}
+      <span className="block">By clicking &ldquo;Continue&rdquo;, you agree to</span>
+      our{" "}
       {legalLinks.map((item, index) => (
         <span key={item.label}>
           <Pressable
@@ -74,11 +77,12 @@ export function SignInDialog({
     >
       {email ? (
         <div className="mt-6">
-          <EmailSignIn
-            tone={lightTone}
-            onCancel={onClose}
-            onSignedIn={done}
-          />
+          {/*
+            No `onCancel`: the dialog's own close button already dismisses it,
+            so a Cancel button underneath would be a second control for the
+            same thing. Checkout still passes one, relabelled &ldquo;Back&rdquo;.
+          */}
+          <EmailSignIn tone={lightTone} onSignedIn={done} />
 
           <Legal />
         </div>
@@ -93,7 +97,7 @@ export function SignInDialog({
                   className={cn(
                     "w-full gap-3 rounded-full px-5 py-3.5",
                     "text-base font-bold tracking-[-0.01em]",
-                    tone,
+                    provider.ready ? tone : lightTone.inert,
                   )}
                 >
                   <provider.Icon aria-hidden className="h-5 w-5 shrink-0" />

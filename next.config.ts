@@ -27,6 +27,7 @@ const nextConfig: NextConfig = {
   outputFileTracingIncludes: {
     "/*": [
       "public/images/countries/**/*",
+      "public/images/flags/**/*",
       "public/images/global/**/*",
       "public/images/regions/**/*",
     ],
