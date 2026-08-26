@@ -1,5 +1,6 @@
 import "server-only";
 
+import { env } from "@/lib/env";
 import { installHref } from "@/lib/install";
 import { LOGO_CID, logoAttachment } from "@/lib/mail/logo";
 import { deliver, escapeHtml, FONT, type Attachment } from "@/lib/mail/send";
@@ -8,10 +9,7 @@ import type { Esim } from "@/lib/types";
 const DATA_URI = /^data:image\/(png|jpeg|gif);base64,(.+)$/i;
 
 /** Mail runs outside a request, so absolute links come from the environment. */
-const SITE = (process.env.NEXT_PUBLIC_SITE_URL ?? "https://nowsim.com").replace(
-  /\/+$/,
-  "",
-);
+const SITE = env.NEXT_PUBLIC_SITE_URL;
 
 /** The HTML points at the QR attachment with src="cid:...". */
 const QR_CID = "nowsim-esim-qr";
@@ -694,6 +692,197 @@ function body(esim: Esim, email: string, hasQr: boolean) {
 </html>`;
 
   return { text, html };
+}
+
+/**
+ * The mail for a plan written onto an eSIM the customer already installed.
+ *
+ * Deliberately not the mail above. There is nothing to install, no QR code to
+ * scan and no activation code to keep secret — the profile is already on the
+ * phone. Install instructions here would read as a mistake, and worse, would
+ * invite someone to try installing a card that can only ever be installed once.
+ *
+ * The activation steps stay: a line left over from an earlier trip may still be
+ * switched off or have roaming disabled.
+ */
+function topUpBody(esim: Esim, email: string) {
+  const year = new Date().getUTCFullYear();
+  const heading = esim.plan
+    ? `Your ${esim.plan.destination} plan is on your eSIM`
+    : "Your new plan is on your eSIM";
+  const shape = esim.plan
+    ? `${esim.plan.data} · ${esim.plan.days} day${esim.plan.days === 1 ? "" : "s"}`
+    : "";
+  const tail = esim.iccid.slice(-6);
+
+  const opening =
+    "Thanks for your order. This plan was added to the eSIM already on your device, so there is nothing to install and no QR code to scan. Any plan that was on that eSIM before has been replaced.";
+
+  const text = [
+    heading,
+    shape,
+    opening,
+    `Added to the eSIM ending ${tail}. Full ICCID: ${esim.iccid}`,
+    "CHECK IT IS SWITCHED ON",
+    "If you have not used this eSIM for a while, these three settings may need turning back on.",
+    ...stepsText(activationSteps),
+    "Once roaming is on, it can take 5 to 10 minutes to find a network the first time.",
+    `You can see this plan any time at ${SITE}/esims.`,
+    `Stuck at any step? Read ${SITE}/help or write to support@nowsim.com from this address. We answer fast.`,
+    "Safe travels, the nowsim team",
+    "Please do not reply to this email.",
+    `Sent to ${email}`,
+    `Copyright © ${year} nowsim. All rights reserved.`,
+  ]
+    .filter(Boolean)
+    .join("\n\n");
+
+  const html = `<!doctype html>
+<html lang="en">
+  <body style="margin:0;padding:0;background:${PAGE}">
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background:${PAGE}">
+      <tr>
+        <td align="center" style="padding:32px 12px">
+          <table role="presentation" width="600" cellpadding="0" cellspacing="0" border="0" style="width:600px;max-width:100%;background:#ffffff">
+
+            <tr>
+              <td style="background:${BRAND};height:4px;line-height:4px;font-size:0">&nbsp;</td>
+            </tr>
+
+            <tr>
+              <td style="padding:40px 40px 0">
+                <img src="cid:${LOGO_CID}" alt="nowsim" width="150" height="25" style="display:block;width:150px;height:25px;border:0;outline:none;text-decoration:none" />
+              </td>
+            </tr>
+
+            <tr>
+              <td style="padding:36px 40px 0">
+                <h1 style="${FONT};margin:0;font-size:26px;font-weight:700;line-height:1.2;letter-spacing:-0.02em;color:${INK}">
+                  ${escapeHtml(heading)}
+                </h1>
+              </td>
+            </tr>
+
+            ${
+              shape
+                ? `<tr>
+              <td style="padding:14px 40px 0">
+                <table role="presentation" cellpadding="0" cellspacing="0" border="0">
+                  <tr>
+                    <td style="${FONT};background:${BRAND_TINT};padding:10px 18px;border-radius:999px;font-size:16px;font-weight:700;letter-spacing:-0.01em;color:${BRAND};white-space:nowrap">
+                      ${escapeHtml(shape)}
+                    </td>
+                  </tr>
+                </table>
+              </td>
+            </tr>`
+                : ""
+            }
+
+            <tr>
+              <td style="${FONT};padding:20px 40px 0;font-size:15px;line-height:1.65;color:${INK}">
+                ${opening}
+              </td>
+            </tr>
+
+            ${card(
+              `${cardTitle("Added to the eSIM ending", escapeHtml(tail))}
+                  ${dataRow("ICCID", value(esim.iccid), true)}`,
+              24,
+            )}
+
+            ${sectionHead(1, "Check it is switched on")}
+
+            <tr>
+              <td style="${FONT};padding:12px 40px 0;font-size:14px;line-height:1.65;color:${MUTED}">
+                If you have not used this eSIM for a while, these three settings
+                may need turning back on.
+              </td>
+            </tr>
+
+            ${stepList(
+              activationSteps.map((step, index) =>
+                stepRow(step, index, index === activationSteps.length - 1),
+              ),
+            )}
+
+            <tr>
+              <td style="${FONT};padding:16px 40px 0;font-size:13px;line-height:1.6;color:${FAINT}">
+                Once roaming is on, it can take 5 to 10 minutes to find a network
+                the first time.
+              </td>
+            </tr>
+
+            ${divider(false)}
+
+            <tr>
+              <td style="background:${FOOTER_TINT};padding:26px 40px">
+                <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%">
+                  <tr>
+                    <td style="${FONT};font-size:13px;line-height:1.8;color:${MUTED};padding-bottom:14px" align="center">
+                      <a href="${SITE}" style="${FONT};color:${MUTED};text-decoration:none">Website</a> &nbsp;·&nbsp;
+                      <a href="${SITE}/help" style="${FONT};color:${MUTED};text-decoration:none">Help centre</a> &nbsp;·&nbsp;
+                      <a href="${SITE}/esims" style="${FONT};color:${MUTED};text-decoration:none">My eSIMs</a>
+                    </td>
+                  </tr>
+
+                  <tr>
+                    <td style="${FONT};font-size:12px;line-height:1.7;color:${FAINT};padding-bottom:6px" align="center">
+                      Please do not reply to this email.
+                    </td>
+                  </tr>
+
+                  <tr>
+                    <td style="${FONT};font-size:12px;line-height:1.7;color:${FAINT};padding-bottom:12px" align="center">
+                      Sent to <span style="color:${BRAND};font-weight:700">${escapeHtml(email)}</span>
+                    </td>
+                  </tr>
+
+                  <tr>
+                    <td style="${FONT};font-size:12px;line-height:1.7;color:${FAINT}" align="center">
+                      Copyright © ${year} nowsim. All rights reserved.
+                    </td>
+                  </tr>
+                </table>
+              </td>
+            </tr>
+
+          </table>
+        </td>
+      </tr>
+    </table>
+  </body>
+</html>`;
+
+  return { text, html };
+}
+
+/** No QR attachment — the eSIM is already on the phone. */
+export async function sendPlanAddedEmail(
+  email: string,
+  esim: Esim,
+): Promise<void> {
+  const { text, html } = topUpBody(esim, email);
+
+  const sent = await deliver({
+    to: email,
+    subject: esim.plan
+      ? `Your ${esim.plan.destination} plan is on your eSIM`
+      : "Your new plan is on your eSIM",
+    text,
+    html,
+    attachments: [logoAttachment()],
+  });
+
+  if (sent) return;
+
+  if (process.env.NODE_ENV === "production") {
+    throw new Error(
+      "RESEND_API_KEY is missing. Cannot mail the plan confirmation.",
+    );
+  }
+
+  console.info(`\n  nowsim plan on ${esim.iccid} would be mailed to ${email}\n`);
 }
 
 export async function sendEsimEmail(email: string, esim: Esim): Promise<void> {

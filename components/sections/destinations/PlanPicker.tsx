@@ -5,9 +5,9 @@ import { MdSmartphone, MdStar, MdVerifiedUser } from "react-icons/md";
 
 import { ActivationNote } from "@/components/sections/destinations/ActivationNote";
 import { DeviceDialog } from "@/components/sections/destinations/DeviceDialog";
+import { Price, usePrice } from "@/components/common/Price";
 import { Pressable } from "@/components/ui/Pressable";
 import { Tabs } from "@/components/ui/Tabs";
-import { formatMoney, scaleMoney } from "@/lib/money";
 import { MAX_ESIMS, checkoutHref } from "@/lib/checkout";
 import type { DestinationKind, DeviceGroup, Plan } from "@/lib/types";
 import { cn } from "@/lib/cn";
@@ -87,7 +87,7 @@ export function PlanPicker({
   const selectedPlan =
     shownPlans.find((plan) => plan.id === selectedId) ?? shownPlans[0];
 
-  const total = formatMoney(scaleMoney(selectedPlan.price, quantity));
+  const total = usePrice(selectedPlan.price, quantity);
 
   return (
     <>
@@ -175,7 +175,7 @@ export function PlanPicker({
                 </p>
 
                 <p className="mt-auto pt-2 text-right text-lg font-bold tracking-[-0.02em]">
-                  {formatMoney(plan.price)}
+                  <Price money={plan.price} />
                 </p>
               </li>
             );

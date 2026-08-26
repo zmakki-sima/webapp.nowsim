@@ -3,7 +3,6 @@ import { notFound } from "next/navigation";
 
 import { CheckoutFlow } from "@/components/sections/checkout/CheckoutFlow";
 import { OrderSummary } from "@/components/sections/checkout/OrderSummary";
-import { formatMoney } from "@/lib/money";
 import { resolveOrder } from "@/lib/order";
 
 export const metadata: Metadata = {
@@ -21,7 +20,7 @@ export default async function CheckoutPage({
 
   if (!order) notFound();
 
-  const { destination } = order;
+  const { destination, plan } = order;
 
   return (
     <section className="px-3 py-12 md:px-4 md:py-16">
@@ -34,7 +33,16 @@ export default async function CheckoutPage({
           </div>
 
           <div className="lg:col-start-1 lg:row-start-1">
-            <CheckoutFlow total={formatMoney(order.total)} />
+            <CheckoutFlow
+              unitPrice={order.unitPrice}
+              quantity={order.quantity}
+              params={{
+                kind: destination.kind,
+                destination: destination.slug,
+                plan: plan.id,
+                qty: String(order.quantity),
+              }}
+            />
           </div>
         </div>
       </div>

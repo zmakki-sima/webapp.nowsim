@@ -5,8 +5,8 @@ import { useRouter } from "next/navigation";
 import { useId, useMemo, useRef, useState, type FormEvent } from "react";
 import { MdSearch } from "react-icons/md";
 
+import { Price } from "@/components/common/Price";
 import { Pressable } from "@/components/ui/Pressable";
-import { formatMoney } from "@/lib/money";
 import { createSearchIndex, search } from "@/lib/search/match";
 import { destinationHref, type DestinationSummary } from "@/lib/types";
 import { cn } from "@/lib/cn";
@@ -206,7 +206,7 @@ export function DestinationSearch({
               </span>
 
               <span className="shrink-0 text-sm font-bold text-ink">
-                {formatMoney(destination.from)}
+                <Price money={destination.from} />
               </span>
             </Pressable>
           </li>

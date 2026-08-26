@@ -1,5 +1,6 @@
 import { MdLock } from "react-icons/md";
 
+import { CurrencyMenu } from "@/components/layout/CurrencyMenu";
 import { NowsimLogo } from "@/components/ui/NowsimLogo";
 import { Pressable } from "@/components/ui/Pressable";
 import { cn } from "@/lib/cn";
@@ -30,10 +31,14 @@ export function CheckoutHeader() {
               />
             </Pressable>
 
-            <p className="flex items-center gap-2 text-sm font-bold md:text-base">
-              <MdLock aria-hidden className="h-4 w-4 text-success" />
-              Secure checkout
-            </p>
+            <div className="flex items-center gap-3 md:gap-4">
+              <p className="hidden items-center gap-2 text-sm font-bold sm:flex md:text-base">
+                <MdLock aria-hidden className="h-4 w-4 text-success" />
+                Secure checkout
+              </p>
+
+              <CurrencyMenu />
+            </div>
           </div>
         </div>
       </div>

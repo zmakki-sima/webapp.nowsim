@@ -1,8 +1,8 @@
 import Image from "next/image";
 import { MdReceiptLong } from "react-icons/md";
 
+import { Price } from "@/components/common/Price";
 import { cn } from "@/lib/cn";
-import { formatMoney } from "@/lib/money";
 import type { Purchase } from "@/lib/types";
 import { formatDay } from "@/lib/units";
 
@@ -72,7 +72,11 @@ export function PurchaseCard({ purchase }: { purchase: Purchase }) {
           </div>
         </div>
 
-        {price && <span className={pill}>{formatMoney(price)}</span>}
+        {price && (
+          <span className={pill}>
+            <Price money={price} />
+          </span>
+        )}
       </div>
 
       <dl className="mt-5 flex flex-wrap gap-x-10 gap-y-4">
