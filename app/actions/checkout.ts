@@ -17,6 +17,7 @@ import {
 import { stripe } from "@/lib/payments/stripe";
 import { convertMoney, currencyCodes, scaleMoney } from "@/lib/money";
 import { resolveOrder } from "@/lib/order";
+import { isDeployed } from "@/lib/stage";
 import type { EsimState } from "@/lib/types";
 
 export type InstallTarget = {
@@ -150,13 +151,13 @@ async function openSessionUrl(orderId: string): Promise<string | null> {
 }
 
 /**
- * Where Stripe sends the customer back to. Production states its own address so
- * a forged `Host` header cannot rewrite it; a dev machine reads the host it was
- * actually reached on, so a local test returns to localhost instead of the live
- * site.
+ * Where Stripe sends the customer back to. A deployment states its own address
+ * so a forged `Host` header cannot rewrite it; a dev machine reads the host it
+ * was actually reached on, so a local test returns to localhost instead of the
+ * deployed site.
  */
 async function returnOrigin(): Promise<string> {
-  if (process.env.NODE_ENV === "production") return env.NEXT_PUBLIC_SITE_URL;
+  if (isDeployed) return env.NEXT_PUBLIC_SITE_URL;
 
   const host = (await headers()).get("host");
 
