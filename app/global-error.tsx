@@ -11,7 +11,7 @@ export default function GlobalError({
   return (
     <html lang="en" className="h-full antialiased">
       <body className="flex min-h-full flex-col items-center justify-center gap-6 px-6 text-center">
-        <title>Something went wrong | nowsim</title>
+        <title>Something went wrong - nowsim</title>
 
         <h1 className="text-h2 font-extrabold tracking-[-0.03em]">
           We lost the signal

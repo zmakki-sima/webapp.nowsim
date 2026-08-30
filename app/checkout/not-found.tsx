@@ -8,7 +8,7 @@ import {
 import { Pressable } from "@/components/ui/Pressable";
 
 export const metadata: Metadata = {
-  title: "Order not found | nowsim",
+  title: "Order not found - nowsim",
   robots: { index: false, follow: false },
 };
 

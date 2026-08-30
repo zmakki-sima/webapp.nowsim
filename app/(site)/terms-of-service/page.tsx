@@ -7,7 +7,7 @@ import {
 } from "@/components/sections/legal/LegalPage";
 
 export const metadata: Metadata = {
-  title: "Terms of Service | nowsim",
+  title: "Terms of Service - nowsim",
   description:
     "The binding terms that govern the purchase and use of nowsim Products and Services, including eSIMs, Data Plans, Virtual Numbers and VPN.",
 };

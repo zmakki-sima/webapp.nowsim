@@ -7,7 +7,7 @@ import { verifySession } from "@/lib/auth/dal";
 import { getOrder } from "@/lib/payments/orders";
 
 export const metadata: Metadata = {
-  title: "Payment not completed | nowsim",
+  title: "Payment not completed - nowsim",
   description: "Your nowsim order was not paid for.",
   robots: { index: false, follow: false },
 };

@@ -8,7 +8,7 @@ import {
 import { Pressable } from "@/components/ui/Pressable";
 
 export const metadata: Metadata = {
-  title: "Destination not found | nowsim",
+  title: "Destination not found - nowsim",
 };
 
 export default function DestinationNotFound() {

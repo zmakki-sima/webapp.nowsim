@@ -13,7 +13,7 @@ import { verifySession } from "@/lib/auth/dal";
 import { getOrder, type OrderStatus } from "@/lib/payments/orders";
 
 export const metadata: Metadata = {
-  title: "Order | nowsim",
+  title: "Order - nowsim",
   description: "Your nowsim order.",
   robots: { index: false, follow: false },
 };

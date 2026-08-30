@@ -6,7 +6,7 @@ import { OrderSummary } from "@/components/sections/checkout/OrderSummary";
 import { resolveOrder } from "@/lib/order";
 
 export const metadata: Metadata = {
-  title: "Checkout | nowsim",
+  title: "Checkout - nowsim",
   description: "Review your eSIM order and pay securely.",
   robots: { index: false, follow: false },
 };

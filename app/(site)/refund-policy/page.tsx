@@ -7,7 +7,7 @@ import {
 } from "@/components/sections/legal/LegalPage";
 
 export const metadata: Metadata = {
-  title: "Refund Policy | nowsim",
+  title: "Refund Policy - nowsim",
   description:
     "How refunds work on data plans and top-ups: the 30-day window, what counts as activation, refund methods, and processing times.",
 };

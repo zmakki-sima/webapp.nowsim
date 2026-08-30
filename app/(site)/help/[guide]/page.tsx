@@ -32,7 +32,7 @@ export async function generateMetadata({
   const guide = getInstallGuide(platform);
 
   return {
-    title: `Installation for ${guide.label} | nowsim`,
+    title: `Installation for ${guide.label} - nowsim`,
     description: `Install your nowsim eSIM on ${guide.devices}, step by step.`,
   };
 }

@@ -5,7 +5,7 @@ import { PurchaseList } from "@/components/sections/purchases/PurchaseList";
 import { getPurchases } from "@/lib/data/purchases";
 
 export const metadata: Metadata = {
-  title: "Purchase History | nowsim",
+  title: "Purchase History - nowsim",
   description: "Every eSIM you have bought and what you paid for it.",
   robots: { index: false, follow: false },
 };

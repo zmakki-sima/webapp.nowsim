@@ -34,7 +34,7 @@ export async function generateMetadata({
   if (!destination) return {};
 
   return {
-    title: `${destination.name} eSIM | nowsim`,
+    title: `${destination.name} eSIM - nowsim`,
     description: blurbText(destination.blurb),
   };
 }

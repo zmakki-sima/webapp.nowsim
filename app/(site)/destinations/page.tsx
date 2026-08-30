@@ -6,7 +6,7 @@ import { getDestinationSummaries } from "@/lib/data/catalog";
 import { isDestinationFilter, type DestinationFilter } from "@/lib/types";
 
 export const metadata: Metadata = {
-  title: "All destinations | nowsim",
+  title: "All destinations - nowsim",
   description:
     "Browse nowsim data plans across 200+ countries, regional bundles, and global plans. Pick a destination and connect the moment you land.",
 };

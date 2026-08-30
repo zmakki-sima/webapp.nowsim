@@ -7,7 +7,7 @@ import {
 } from "@/components/sections/legal/LegalPage";
 
 export const metadata: Metadata = {
-  title: "Privacy Policy | nowsim",
+  title: "Privacy Policy - nowsim",
   description:
     "What personal data we collect, why we collect it, how we use and share it, how long we keep it, and the rights you have over it.",
 };
