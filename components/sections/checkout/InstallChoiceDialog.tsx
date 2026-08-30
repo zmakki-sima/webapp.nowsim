@@ -25,7 +25,7 @@ function statusOf({ state, expiresAt }: InstallTarget): string {
 
   const when = formatSlashDay(expiresAt);
 
-  return state === "active" ? `Active until ${when}` : `Expired ${when}`;
+  return state === "expired" ? `Expired ${when}` : `Active until ${when}`;
 }
 
 function Art({ src, size }: { src?: string; size: string }) {

@@ -3,6 +3,7 @@ import { blurbFor } from "@/lib/copy";
 import { heroFor } from "@/lib/heroes";
 import { money, type Money } from "@/lib/money";
 import { slugify } from "@/lib/slugify";
+import { isRunningEsim } from "@/lib/types";
 import type {
   CoveredCountry,
   Destination,
@@ -269,6 +270,27 @@ function toUsage(esim: ApiEsim): EsimUsage | undefined {
   return { usedMb, totalMb, leftMb };
 }
 
+/**
+ * Upstream reports the profile's own lifecycle in `status_qr`, independently of
+ * whether a plan is running: `Enabled` once the card is installed on a device,
+ * `Released` while the QR has been issued but never used, `Deleted` once the
+ * profile is gone from the SM-DP+. An unrecognised value is treated as unknown
+ * rather than guessed at, so a new upstream status degrades to the plan-based
+ * reading instead of silently claiming the card is installed.
+ */
+function profileOf(esim: ApiEsim): "enabled" | "released" | "deleted" | null {
+  switch ((esim.status_qr ?? "").trim().toLowerCase()) {
+    case "enabled":
+      return "enabled";
+    case "released":
+      return "released";
+    case "deleted":
+      return "deleted";
+    default:
+      return null;
+  }
+}
+
 function toState(
   esim: ApiEsim,
   expiresAt: string | undefined,
@@ -276,18 +298,29 @@ function toState(
 ): EsimState {
   if (String(esim.is_deleted ?? "0") === "1") return "removed";
 
-  if ((esim.status_qr ?? "").toLowerCase() === "deleted") return "removed";
+  const profile = profileOf(esim);
 
-  if (expiresAt) return Date.parse(expiresAt) > now ? "active" : "expired";
+  if (profile === "deleted") return "removed";
 
-  return esim.active_plan_id ? "active" : "ready";
+  // Expiry outranks the profile status: an installed card whose plan has run
+  // out is expired, not active.
+  if (expiresAt && Date.parse(expiresAt) <= now) return "expired";
+
+  const running = Boolean(expiresAt || esim.active_plan_id);
+
+  if (!running) return "ready";
+
+  // A card with a plan but no recognised profile status is reported the way it
+  // was before the two were split apart.
+  return profile === "released" ? "issued" : "installed";
 }
 
 const stateRank: Record<EsimState, number> = {
-  active: 0,
-  ready: 1,
-  expired: 2,
-  removed: 3,
+  installed: 0,
+  issued: 1,
+  ready: 2,
+  expired: 3,
+  removed: 4,
 };
 
 function byUrgency(a: Esim, b: Esim): number {
@@ -298,7 +331,7 @@ function byUrgency(a: Esim, b: Esim): number {
   const left = Date.parse(a.expiresAt ?? a.activatedAt ?? "") || 0;
   const right = Date.parse(b.expiresAt ?? b.activatedAt ?? "") || 0;
 
-  return a.state === "active" ? left - right : right - left;
+  return isRunningEsim(a) ? left - right : right - left;
 }
 
 export function toEsims(
@@ -319,7 +352,7 @@ export function toEsims(
         activatedAt: toIso(esim.plan_activated_at),
         expiresAt,
         daysLeft:
-          state === "active" && expiresAt
+          expiresAt && state !== "expired" && state !== "removed"
             ? Math.max(Math.ceil((Date.parse(expiresAt) - now) / DAY_MS), 0)
             : undefined,
         usage: toUsage(esim),

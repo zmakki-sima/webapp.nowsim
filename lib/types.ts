@@ -87,7 +87,18 @@ export type DeviceGroup = {
   devices: string[];
 };
 
-export type EsimState = "active" | "ready" | "expired" | "removed";
+/**
+ * `installed` and `issued` both carry a live plan and differ only in whether the
+ * profile ever reached a device — upstream `status_qr` is `Enabled` once it has,
+ * `Released` while the QR is still outstanding. Keeping them apart is what tells
+ * a customer whose card is working from one who still has an install to do.
+ */
+export type EsimState =
+  | "installed"
+  | "issued"
+  | "ready"
+  | "expired"
+  | "removed";
 
 export type EsimUsage = {
   usedMb: number;
@@ -129,12 +140,29 @@ export type Purchase = {
 };
 
 export const esimStateLabels: Record<EsimState, string> = {
-  active: "Active",
+  installed: "Active",
+  issued: "Not installed",
   ready: "Ready to use",
   expired: "Expired",
   removed: "Removed",
 };
 
+/** States whose plan is still running, so usage and expiry are worth reading. */
+export function isRunningEsim(esim: Esim): boolean {
+  return esim.state === "installed" || esim.state === "issued";
+}
+
 export function isLiveEsim(esim: Esim): boolean {
-  return esim.state === "active" || esim.state === "ready";
+  return isRunningEsim(esim) || esim.state === "ready";
+}
+
+/**
+ * States worth showing the customer on their eSIM list. An expired card is kept
+ * because the profile is still installed on the device: a new plan can be
+ * written to it at checkout, sparing the customer the install. Only `removed`
+ * is dropped — that profile is gone from the SM-DP+ and cannot be written to,
+ * which is the same line `listInstallTargets` draws for top-up targets.
+ */
+export function isReusableEsim(esim: Esim): boolean {
+  return esim.state !== "removed";
 }

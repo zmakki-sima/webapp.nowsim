@@ -3,6 +3,7 @@
 import Image from "next/image";
 import { useEffect, useState } from "react";
 import {
+  MdAdd,
   MdCheck,
   MdMailOutline,
   MdQrCode2,
@@ -28,15 +29,17 @@ const pill = cn(
 
 const spec = cn(
   "shrink-0 rounded-full px-2.5 py-0.5",
-  "text-[0.8125rem]/[1.125rem] font-medium text-muted",
-  "bg-ink/8",
+  "text-[0.8125rem]/[1.125rem] font-medium text-brand",
+  /* Brand-tinted, not grey — greys go muddy on the lilac card. */
+  "bg-brand/10",
 );
 
 const pillTone: Record<EsimState, string> = {
-  active: "bg-success/12 text-success",
+  installed: "bg-success/12 text-success",
+  issued: "bg-ink/8 text-muted",
   ready: "bg-brand/15 text-brand",
   expired: "bg-ink/8 text-muted",
-  removed: "bg-ink/8 text-muted",
+  removed: "bg-danger/15 text-danger",
 };
 
 const action = cn(
@@ -85,6 +88,11 @@ export function EsimCard({ esim }: { esim: Esim }) {
     esim.qrImage || esim.activationCode || esim.installLocked,
   );
 
+  // An expired card still holds its profile, so the customer can buy a new plan
+  // onto it and skip the install. Checkout does the actual picking; this only
+  // sends them there with the plan browser open.
+  const expired = state === "expired";
+
   useEffect(() => {
     if (!mail?.ok) return;
 
@@ -111,11 +119,11 @@ export function EsimCard({ esim }: { esim: Esim }) {
   }
 
   return (
-    <li className="rounded-sheet bg-ink/5 p-5 md:p-6">
+    <li className="rounded-sheet bg-surface-soft p-5 md:p-6">
       <div className="flex items-start justify-between gap-4">
         <div className="flex min-w-0 items-center gap-3.5">
           {plan?.art ? (
-            <span className="relative h-11 w-11 shrink-0 overflow-hidden rounded-full bg-ink/8">
+            <span className="relative h-11 w-11 shrink-0 overflow-hidden rounded-full bg-brand/10">
               <Image
                 src={plan.art}
                 alt=""
@@ -127,7 +135,7 @@ export function EsimCard({ esim }: { esim: Esim }) {
               />
             </span>
           ) : (
-            <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-ink/8">
+            <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-brand/10">
               <MdSimCard aria-hidden className="h-5 w-5 text-muted" />
             </span>
           )}
@@ -171,12 +179,12 @@ export function EsimCard({ esim }: { esim: Esim }) {
             aria-valuenow={spent}
             aria-valuemin={0}
             aria-valuemax={100}
-            className="mt-2 h-2 overflow-hidden rounded-full bg-ink/10"
+            className="mt-2 h-2 overflow-hidden rounded-full bg-brand/12"
           >
             <div
               className={cn(
                 "h-full rounded-full",
-                live ? "bg-brand" : "bg-ink/25",
+                live ? "bg-success" : "bg-ink/25",
               )}
               style={{ width: `${Math.min(Math.max(spent, 0), 100)}%` }}
             />
@@ -192,7 +200,7 @@ export function EsimCard({ esim }: { esim: Esim }) {
 
           {esim.expiresAt && (
             <Fact
-              label={state === "active" ? "Expires" : "Expired"}
+              label={state === "expired" ? "Expired" : "Expires"}
               value={
                 esim.daysLeft === undefined
                   ? formatDay(esim.expiresAt)
@@ -206,33 +214,44 @@ export function EsimCard({ esim }: { esim: Esim }) {
       )}
 
       <div className="mt-6 flex flex-wrap items-center gap-3">
+        {expired && (
+          <Pressable href="/destinations" className={primary}>
+            <MdAdd aria-hidden className="h-4 w-4" />
+            Add a new plan
+          </Pressable>
+        )}
+
         {installable && (
           <>
             <Pressable
               aria-haspopup="dialog"
               aria-expanded={installing}
               onClick={() => setInstalling(true)}
-              className={primary}
+              className={expired ? secondary : primary}
             >
               <MdQrCode2 aria-hidden className="h-4 w-4" />
               Install details
             </Pressable>
 
-            <Pressable
-              onClick={sendEmail}
-              disabled={mailing || mail?.ok}
-              className={cn(
-                mailing || mail?.ok ? quiet : secondary,
-                "gap-2 sm:ml-auto",
-              )}
-            >
-              {mail?.ok ? (
-                <MdCheck aria-hidden className="h-4 w-4" />
-              ) : (
-                <MdMailOutline aria-hidden className="h-4 w-4" />
-              )}
-              {mail?.ok ? "Sent" : mailing ? "Sending…" : "Resend email"}
-            </Pressable>
+            {/* The profile is already on the device once a plan has expired;
+                re-sending the install mail has nothing left to tell them. */}
+            {!expired && (
+              <Pressable
+                onClick={sendEmail}
+                disabled={mailing || mail?.ok}
+                className={cn(
+                  mailing || mail?.ok ? quiet : secondary,
+                  "gap-2 sm:ml-auto",
+                )}
+              >
+                {mail?.ok ? (
+                  <MdCheck aria-hidden className="h-4 w-4" />
+                ) : (
+                  <MdMailOutline aria-hidden className="h-4 w-4" />
+                )}
+                {mail?.ok ? "Sent" : mailing ? "Sending…" : "Resend email"}
+              </Pressable>
+            )}
           </>
         )}
       </div>

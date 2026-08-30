@@ -3,10 +3,10 @@ import { redirect } from "next/navigation";
 
 import { EsimList } from "@/components/sections/esims/EsimList";
 import { getEsims } from "@/lib/data/esims";
-import { isLiveEsim } from "@/lib/types";
+import { isReusableEsim } from "@/lib/types";
 
 export const metadata: Metadata = {
-  title: "My eSIMs | nowsim",
+  title: "My eSIMs - nowsim",
   description: "Your eSIMs, their data left, and how to install them.",
   robots: { index: false, follow: false },
 };
@@ -19,7 +19,7 @@ export default async function EsimsPage() {
   return (
     <section className="px-3 pb-20 pt-28 md:px-4 md:py-28">
       <div className="mx-auto max-w-3xl">
-        <EsimList esims={esims.filter(isLiveEsim)} title="My eSIM’s" />
+        <EsimList esims={esims.filter(isReusableEsim)} title="My eSIM’s" />
       </div>
     </section>
   );
