@@ -13,9 +13,16 @@ const providers = authProviders;
 
 const tone = lightTone.primary;
 
-function Legal() {
+// Spacing is left to the caller: the provider list needs a full gap above this,
+// while inside the email form it rides the form's own `gap-3`.
+function Legal({ className }: { className?: string }) {
   return (
-    <p className="mt-6 text-center text-xs leading-relaxed text-muted">
+    <p
+      className={cn(
+        "text-center text-xs leading-relaxed text-muted",
+        className,
+      )}
+    >
       {/*
         Broken deliberately after &ldquo;to&rdquo; so the sentence does not wrap
         mid-phrase: &ldquo;our&rdquo; stays on the second line with the two
@@ -82,9 +89,16 @@ export function SignInDialog({
             so a Cancel button underneath would be a second control for the
             same thing. Checkout still passes one, relabelled &ldquo;Back&rdquo;.
           */}
-          <EmailSignIn tone={lightTone} onSignedIn={done} />
-
-          <Legal />
+          {/*
+            `<Legal />` goes to `EmailSignIn` rather than sitting here, so it
+            follows the &ldquo;Continue&rdquo; button it describes and drops
+            away on the code step, where that click has already happened.
+          */}
+          <EmailSignIn
+            tone={lightTone}
+            legal={<Legal className="mt-1" />}
+            onSignedIn={done}
+          />
         </div>
       ) : (
         <>
@@ -107,7 +121,7 @@ export function SignInDialog({
             ))}
           </ul>
 
-          <Legal />
+          <Legal className="mt-6" />
         </>
       )}
     </Dialog>

@@ -1,7 +1,13 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useActionState, useEffect, useRef, useState } from "react";
+import {
+  useActionState,
+  useEffect,
+  useRef,
+  useState,
+  type ReactNode,
+} from "react";
 import { MdCancel } from "react-icons/md";
 
 import {
@@ -82,6 +88,7 @@ function EmailStep({
   action,
   pending,
   cancelLabel,
+  legal,
   onCancel,
 }: {
   tone: SignInTone;
@@ -89,6 +96,7 @@ function EmailStep({
   action: (formData: FormData) => void;
   pending: boolean;
   cancelLabel?: string;
+  legal?: ReactNode;
   onCancel?: () => void;
 }) {
   const [email, setEmail] = useState(state.email);
@@ -129,6 +137,8 @@ function EmailStep({
           {cancelLabel ?? "Cancel"}
         </Pressable>
       ) : null}
+
+      {legal}
     </form>
   );
 }
@@ -295,11 +305,18 @@ function CodeStep({
 export function EmailSignIn({
   tone,
   cancelLabel,
+  legal,
   onCancel,
   onSignedIn,
 }: {
   tone: SignInTone;
   cancelLabel?: string;
+  /*
+    Consent copy for the &ldquo;Continue&rdquo; button that sends the code. It
+    only belongs on the email step: by the code step that click has already
+    happened, so repeating it there says nothing new.
+  */
+  legal?: ReactNode;
   onCancel?: () => void;
   onSignedIn?: () => void;
 }) {
@@ -351,6 +368,7 @@ export function EmailSignIn({
       action={sendCode}
       pending={sending}
       cancelLabel={cancelLabel}
+      legal={legal}
       onCancel={onCancel}
     />
   );
