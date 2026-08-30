@@ -105,7 +105,7 @@ export function CurrencyMenu() {
         <MdExpandMore
           aria-hidden
           className={cn(
-            "h-4 w-4 text-muted",
+            "h-4 w-4 text-brand",
             "transition-transform duration-200 ease-hover motion-reduce:transition-none",
             open && "rotate-180",
           )}

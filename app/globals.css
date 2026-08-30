@@ -16,7 +16,7 @@
 
   --color-surface: #ffffff;
   /* Soft surfaces carry a brand tint, not grey — the house theme is purple. */
-  --color-surface-soft: color-mix(in srgb, var(--color-brand) 6%, #ffffff);
+  --color-surface-soft: color-mix(in srgb, var(--color-brand) 4%, #ffffff);
   --color-hairline: color-mix(in srgb, var(--color-ink) 12%, transparent);
 
   --color-muted: color-mix(in srgb, var(--color-ink) 62%, transparent);
@@ -161,6 +161,49 @@
     &::-webkit-scrollbar-thumb:hover {
       background: color-mix(in srgb, var(--color-ink) 36%, transparent);
     }
+  }
+}
+
+/*
+ * Live gradient for the hero's "CONNECTED" — a highlight sweeping through the
+ * word. One hue only (volt): the stops vary brightness, not color, so it reads
+ * as light travelling across the text rather than a color cycle. Dimming is a
+ * mix toward ink, brightening toward white; the first and last stops match so
+ * the loop closes without a visible jump.
+ *
+ * The gradient is painted onto the text itself via background-clip, so the
+ * band must be wider than the word (200%) and slid by half its width for a
+ * seamless cycle.
+ */
+@keyframes signal-sweep {
+  to {
+    background-position: 200% 50%;
+  }
+}
+
+@utility text-signal {
+  --signal-dim: color-mix(in srgb, var(--color-volt) 72%, var(--color-ink));
+  --signal-lit: color-mix(in srgb, var(--color-volt) 78%, #ffffff);
+
+  background-image: linear-gradient(
+    100deg,
+    var(--signal-dim),
+    var(--color-volt),
+    var(--signal-lit),
+    var(--color-volt),
+    var(--signal-dim)
+  );
+  background-size: 200% 100%;
+  background-position: 0% 50%;
+
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+
+  animation: signal-sweep 6s linear infinite;
+
+  @media (prefers-reduced-motion: reduce) {
+    animation: none;
   }
 }
 

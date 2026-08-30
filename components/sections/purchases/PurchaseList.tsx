@@ -40,11 +40,11 @@ export function PurchaseList({
         {title}
       </h1>
 
-      <div className="mt-8">
+      <div className="mt-12">
         {purchases.length === 0 ? (
           <Empty />
         ) : (
-          <ul className="flex flex-col gap-4">
+          <ul className="flex flex-col divide-y divide-hairline">
             {purchases.map((purchase) => (
               <PurchaseCard key={purchase.id} purchase={purchase} />
             ))}

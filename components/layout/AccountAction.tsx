@@ -95,14 +95,14 @@ function CopyId({ userId }: { userId: string }) {
     >
       <span className="shrink-0 font-semibold">Yesim User ID</span>
 
-      <span className="min-w-0 flex-1 truncate text-right text-muted">
+      <span className="min-w-0 flex-1 truncate text-right text-brand">
         {userId}
       </span>
 
       {copied ? (
-        <MdCheck aria-hidden className="h-5 w-5 shrink-0" />
+        <MdCheck aria-hidden className="h-5 w-5 shrink-0 text-brand" />
       ) : (
-        <MdContentCopy aria-hidden className="h-5 w-5 shrink-0 text-muted" />
+        <MdContentCopy aria-hidden className="h-5 w-5 shrink-0 text-brand" />
       )}
 
       <span className="sr-only">
@@ -237,7 +237,7 @@ export function AccountAction() {
         title="Account"
       >
         <div className={cn(row, "mt-6 flex items-center gap-3")}>
-          <MdPerson aria-hidden className="h-5 w-5 shrink-0 text-muted" />
+          <MdPerson aria-hidden className="h-5 w-5 shrink-0 text-brand" />
           <p className="min-w-0 flex-1 truncate">{account.email}</p>
         </div>
 

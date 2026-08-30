@@ -10,7 +10,7 @@ function Empty() {
     <div
       className={cn(
         "flex flex-col items-center justify-center rounded-sheet",
-        "bg-brand/6 px-6 py-24 text-center",
+        "bg-surface-soft px-6 py-24 text-center",
       )}
     >
       <span className="flex h-14 w-14 items-center justify-center rounded-card bg-brand/12">

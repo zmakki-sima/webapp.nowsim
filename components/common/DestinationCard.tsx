@@ -58,7 +58,7 @@ export function DestinationCard({
 
       <MdChevronRight
         aria-hidden
-        className="h-5 w-5 shrink-0 text-ink/60 transition-[color,translate] duration-300 ease-hover group-hover:translate-x-0.5 group-hover:text-ink motion-reduce:transition-none"
+        className="h-5 w-5 shrink-0 text-brand/40 transition-[color,translate] duration-300 ease-hover group-hover:translate-x-0.5 group-hover:text-brand motion-reduce:transition-none"
       />
     </Pressable>
   );

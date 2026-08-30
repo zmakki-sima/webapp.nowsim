@@ -105,7 +105,7 @@ export function Tabs<Id extends string>({
             {item.badge ? (
               <span
                 className={cn(
-                  "rounded-full bg-volt px-2 py-1 text-ink",
+                  "rounded-full bg-brand px-2 py-1 text-white",
                   "text-[0.625rem] font-bold uppercase tracking-[0.08em]",
                 )}
               >

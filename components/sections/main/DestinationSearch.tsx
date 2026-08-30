@@ -141,7 +141,7 @@ export function DestinationSearch({
           type="submit"
           press={false}
           className={cn(
-            "h-12 w-12 shrink-0 rounded-full bg-brand text-volt",
+            "h-12 w-12 shrink-0 rounded-full bg-brand text-white",
             "transition-colors duration-300 ease-hover motion-reduce:transition-none",
             "hover:bg-brand-soft active:bg-brand-soft",
           )}

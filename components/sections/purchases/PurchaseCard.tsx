@@ -6,12 +6,6 @@ import { cn } from "@/lib/cn";
 import type { Purchase } from "@/lib/types";
 import { formatDay } from "@/lib/units";
 
-const spec = cn(
-  "shrink-0 rounded-full px-2.5 py-0.5",
-  "text-[0.8125rem]/[1.125rem] font-medium text-muted",
-  "bg-ink/8",
-);
-
 const pill = cn(
   "shrink-0 rounded-full px-3 py-1",
   "text-[0.8125rem]/[1.125rem] font-bold",
@@ -35,8 +29,8 @@ export function PurchaseCard({ purchase }: { purchase: Purchase }) {
   const { plan, price } = purchase;
 
   return (
-    <li className="rounded-sheet bg-ink/5 p-5 md:p-6">
-      <div className="flex items-start justify-between gap-4">
+    <li className="px-1 py-8 first:pt-0 last:pb-0 md:px-2">
+      <div className="flex items-center justify-between gap-4">
         <div className="flex min-w-0 items-center gap-3.5">
           {plan?.art ? (
             <span className="relative h-11 w-11 shrink-0 overflow-hidden rounded-full bg-ink/8">
@@ -56,20 +50,9 @@ export function PurchaseCard({ purchase }: { purchase: Purchase }) {
             </span>
           )}
 
-          <div className="min-w-0">
-            <h3 className="truncate text-h3">
-              {plan ? `${plan.destination} eSIM` : "eSIM"}
-            </h3>
-
-            {plan && (
-              <p className="mt-2 flex flex-wrap items-center gap-2">
-                <span className={spec}>{plan.data}</span>
-                <span className={spec}>
-                  {plan.days} day{plan.days === 1 ? "" : "s"}
-                </span>
-              </p>
-            )}
-          </div>
+          <h3 className="min-w-0 truncate text-h3">
+            {plan ? `${plan.destination} eSIM` : "eSIM"}
+          </h3>
         </div>
 
         {price && (
@@ -79,16 +62,22 @@ export function PurchaseCard({ purchase }: { purchase: Purchase }) {
         )}
       </div>
 
-      <dl className="mt-5 flex flex-wrap gap-x-10 gap-y-4">
+      <dl className="mt-4 flex flex-wrap gap-x-10 gap-y-3">
+        {plan && (
+          <>
+            <Fact label="Data" value={plan.data} />
+            <Fact
+              label="Validity"
+              value={`${plan.days} day${plan.days === 1 ? "" : "s"}`}
+            />
+          </>
+        )}
+
         {purchase.boughtAt && (
           <Fact label="Bought" value={formatDay(purchase.boughtAt)} />
         )}
 
         {purchase.iccid && <Fact label="ICCID" value={purchase.iccid} />}
-
-        {purchase.paymentId && (
-          <Fact label="Payment" value={purchase.paymentId} />
-        )}
       </dl>
     </li>
   );
