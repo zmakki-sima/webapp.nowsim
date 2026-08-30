@@ -1,5 +1,6 @@
 import "server-only";
 
+import { sendOrderAlertEmail } from "@/lib/mail/alert";
 import { sendEsimEmail, sendPlanAddedEmail } from "@/lib/mail/esim";
 import {
   appendIssued,
@@ -51,18 +52,26 @@ export async function fulfilOrder(order: OrderRecord): Promise<void> {
   } catch (cause) {
     const reason = reasonOf(cause);
 
-    await markFailed(order.id, reason, issued);
+    // The stored record, not the one this function started with: it carries the
+    // `failed` status and the cards actually banked, which is what the alert
+    // reports. Falling back keeps a failed write from silencing the alert.
+    const failed = await markFailed(order.id, reason, issued);
 
-    alert(order, `provisioning failed after ${issued.length} of ${order.quantity}: ${reason}`);
+    await alert(
+      failed ?? { ...order, status: "failed", issued },
+      `provisioning failed after ${issued.length} of ${order.quantity}: ${reason}`,
+    );
 
     return;
   }
 
   // The cards exist and are paid for. From here nothing may re-buy anything:
   // a failed email is an annoyance, a repeated purchase is a real loss.
-  await markFulfilled(order.id, issued);
+  const fulfilled = await markFulfilled(order.id, issued);
 
-  await deliver(order, issued);
+  // Anything alerted from here on describes a `fulfilled` order, so hand on the
+  // stored record rather than the `paid` copy this function was called with.
+  await deliver(fulfilled ?? { ...order, status: "fulfilled", issued }, issued);
 }
 
 /**
@@ -82,7 +91,10 @@ async function deliver(
   try {
     account = await readAccountEsims(order.accountId);
   } catch (cause) {
-    alert(order, `issued ${issued.length} eSIM(s) but could not read them back: ${reasonOf(cause)}`);
+    await alert(
+      order,
+      `issued ${issued.length} eSIM(s) but could not read them back: ${reasonOf(cause)}`,
+    );
 
     return;
   }
@@ -91,7 +103,10 @@ async function deliver(
     const esim = account.get(entry.iccid);
 
     if (!esim) {
-      alert(order, `eSIM ${entry.iccid} was issued but Yesim does not list it`);
+      await alert(
+        order,
+        `eSIM ${entry.iccid} was issued but Yesim does not list it`,
+      );
 
       continue;
     }
@@ -103,7 +118,7 @@ async function deliver(
         ? sendPlanAddedEmail(order.email, esim)
         : sendEsimEmail(order.email, esim));
     } catch (cause) {
-      alert(
+      await alert(
         order,
         `eSIM ${entry.iccid} was issued but not emailed: ${reasonOf(cause)}`,
       );
@@ -116,12 +131,35 @@ function reasonOf(cause: unknown): string {
 }
 
 /**
- * Money is held and something did not arrive. Console for now — the alert
- * channel is still undecided — but tagged so it can be routed to a person
- * without hunting through the rest of the log.
+ * Money is held and something did not arrive.
+ *
+ * Refunding is deliberately not automatic: the published refund policy is
+ * request-and-review within 15 business days, so a person issues the refund
+ * from the Stripe dashboard and `charge.refunded` brings the order back in
+ * step. That makes this the only thing standing between a failed order and a
+ * customer who paid for nothing — it has to reach someone.
+ *
+ * Two destinations, in this order. The console line is written first and
+ * unconditionally: it costs nothing, cannot fail, and is the record that
+ * survives if the mail does not. The mail is what actually reaches a person —
+ * customer service, at ORDER_ALERT_EMAIL (PAYMENT.md §13.5).
+ *
+ * The mail failing is caught here rather than thrown. `fulfilOrder` must never
+ * throw, and a supervisor who cannot be emailed is not a reason to tell Stripe
+ * to retry a purchase that must not be retried. A failed alert is logged loudly
+ * enough to be found — this is the one case where the console line is all we
+ * have left.
  */
-function alert(order: OrderRecord, detail: string): void {
+async function alert(order: OrderRecord, detail: string): Promise<void> {
   console.error(
     `[ORDER NEEDS ATTENTION] ${order.id} · ${order.email} · ${order.destination} · ${detail}`,
   );
+
+  try {
+    await sendOrderAlertEmail(order, detail);
+  } catch (cause) {
+    console.error(
+      `[ALERT UNDELIVERED] could not email the order alert for ${order.id}: ${reasonOf(cause)}`,
+    );
+  }
 }
