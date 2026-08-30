@@ -43,7 +43,7 @@ const groups: LinkGroup[] = [
     title: "Support",
     links: [
       { label: "Help", href: "/help" },
-      { label: "eSIM compatible devices", href: "/esim-compatible-devices" },
+      { label: "eSIM compatible devices", href: "/help/esim-compatible-devices" },
       { label: "Refund Policy", href: "/refund-policy" },
       { label: "Privacy policy", href: "/privacy-policy" },
       { label: "Terms of Service", href: "/terms-of-service" },

@@ -10,9 +10,9 @@ import {
 } from "@/lib/data/catalog";
 
 export const metadata: Metadata = {
-  title: "Help | nowsim",
+  title: "Help - nowsim",
   description:
-    "Search nowsim help: install your eSIM on iOS or Android, check device compatibility, find your activation details, and read our refund policy.",
+    "Install your eSIM on iOS or Android, check device compatibility, find your activation details, and read our refund policy",
 };
 
 export default async function HelpPage() {
@@ -23,7 +23,7 @@ export default async function HelpPage() {
 
   return (
     <>
-      <section className="px-6 pb-16 pt-36 md:px-12 md:pb-24 md:pt-44">
+      <section className="px-6 pb-16 pt-28 md:px-12 md:pb-24">
         <div className="mx-auto max-w-7xl">
           <Breadcrumb
             className="mb-10"

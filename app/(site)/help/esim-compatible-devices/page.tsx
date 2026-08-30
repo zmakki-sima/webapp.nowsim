@@ -5,7 +5,7 @@ import { Breadcrumb } from "@/components/ui/Breadcrumb";
 import { getDeviceGroups } from "@/lib/data/devices";
 
 export const metadata: Metadata = {
-  title: "eSIM compatible devices | nowsim",
+  title: "eSIM compatible devices - nowsim",
   description:
     "Check whether your phone, tablet, laptop, smartwatch, or router supports eSIM before you buy a nowsim data plan.",
 };
@@ -20,6 +20,7 @@ export default async function CompatibleDevicesPage() {
           className="mb-10"
           items={[
             { label: "Home", href: "/" },
+            { label: "Help", href: "/help" },
             { label: "eSIM compatible devices" },
           ]}
         />

@@ -4,6 +4,7 @@ import { env } from "@/lib/env";
 import { installHref } from "@/lib/install";
 import { LOGO_CID, logoAttachment } from "@/lib/mail/logo";
 import { deliver, escapeHtml, FONT, type Attachment } from "@/lib/mail/send";
+import { isDeployed } from "@/lib/stage";
 import type { Esim } from "@/lib/types";
 
 const DATA_URI = /^data:image\/(png|jpeg|gif);base64,(.+)$/i;
@@ -482,7 +483,7 @@ function body(esim: Esim, email: string, hasQr: boolean) {
                       </span>
                       <span style="display:block;padding-top:6px;color:${MUTED}">
                         Not sure your phone takes an eSIM? Check the
-                        <a href="${SITE}/esim-compatible-devices" style="${link}">compatible devices</a>
+                        <a href="${SITE}/help/esim-compatible-devices" style="${link}">compatible devices</a>
                         list, or read the
                         <a href="${SITE}/help" style="${link}">help centre</a>.
                       </span>
@@ -876,7 +877,7 @@ export async function sendPlanAddedEmail(
 
   if (sent) return;
 
-  if (process.env.NODE_ENV === "production") {
+  if (isDeployed) {
     throw new Error(
       "RESEND_API_KEY is missing. Cannot mail the plan confirmation.",
     );
@@ -901,7 +902,7 @@ export async function sendEsimEmail(email: string, esim: Esim): Promise<void> {
 
   if (sent) return;
 
-  if (process.env.NODE_ENV === "production") {
+  if (isDeployed) {
     throw new Error(
       "RESEND_API_KEY is missing. Cannot mail the eSIM install details.",
     );
