@@ -4,7 +4,15 @@
  * ever applied at the last moment — when a price is painted, or when Stripe is
  * told what to charge.
  */
-export const currencyCodes = ["EUR", "USD", "CHF", "BHD", "AED"] as const;
+/**
+ * Only currencies the Stripe account can actually settle in. Offering one it
+ * cannot is invisible until checkout, where Stripe refuses the session outright
+ * — the customer picks a plan, presses Pay and hits a dead end. BHD was here
+ * and did exactly that: the account has no Bahraini bank account, so `bhd` is
+ * absent from the list Stripe accepts. Adding a currency back means adding a
+ * bank account for it in the Stripe dashboard first.
+ */
+export const currencyCodes = ["EUR", "USD", "CHF", "AED"] as const;
 
 export type Currency = (typeof currencyCodes)[number];
 
@@ -25,10 +33,11 @@ type CurrencyFacts = {
    */
   rate: number;
   /**
-   * Coarsest step an amount is allowed to land on, in minor units. Stripe
-   * rejects a three-decimal amount whose last digit is not zero, so the dinar
-   * is quantised to 10 fils here rather than being rounded down by Stripe into
-   * a total the customer was never shown.
+   * Coarsest step an amount is allowed to land on, in minor units. `1` for
+   * every currency here, since all four are two-decimal ones. It exists for the
+   * three-decimal currencies — Stripe rejects those unless the last digit is
+   * zero, so one would need `step: 10` to be quantised here rather than rounded
+   * by Stripe into a total the customer was never shown.
    */
   step: number;
   /** Spoken name, for the currency menu. */
@@ -39,7 +48,6 @@ export const currencies: Record<Currency, CurrencyFacts> = {
   EUR: { decimals: 2, rate: 1, step: 1, label: "Euro" },
   USD: { decimals: 2, rate: 1.08, step: 1, label: "US Dollar" },
   CHF: { decimals: 2, rate: 0.94, step: 1, label: "Swiss Franc" },
-  BHD: { decimals: 3, rate: 0.41, step: 10, label: "Bahraini Dinar" },
   AED: { decimals: 2, rate: 3.97, step: 1, label: "UAE Dirham" },
 };
 
@@ -92,13 +100,13 @@ function formatterFor(currency: Currency): Intl.NumberFormat {
 
 /**
  * `en-US` puts the euro and dollar signs in front of the digits but writes the
- * franc, dinar and dirham as a leading code — `BHD 12.346`. Prices sit next to
- * each other in the catalog, so the mark is moved after the number for those
- * three and every price lines up on its first digit whichever currency is
- * selected.
+ * franc and dirham as a leading code — `AED 12.34`. Prices sit next to each
+ * other in the catalog, so the mark is moved after the number for those two and
+ * every price lines up on its first digit whichever currency is selected.
  *
  * Only the currency part is moved: the grouping and the decimal count still
- * come from `Intl`, which is what keeps the dinar at three places.
+ * come from `Intl`, which is what would keep a three-decimal currency at three
+ * places if one were added.
  */
 export function formatMoney({ amount, currency }: Money): string {
   const parts = formatterFor(currency).formatToParts(amount / minorUnits(currency));
@@ -108,7 +116,7 @@ export function formatMoney({ amount, currency }: Money): string {
   const at = parts.findIndex((part) => part.type === "currency");
 
   // A *symbol* (€, $) is left where it is; only an alphabetic code is moved,
-  // which is the form the franc, dinar and dirham take.
+  // which is the form the franc and dirham take.
   const moves =
     at !== -1 &&
     /^\p{L}+$/u.test(parts[at].value) &&
