@@ -2,6 +2,7 @@ import "server-only";
 
 import { LOGO_CID, logoAttachment } from "@/lib/mail/logo";
 import { deliver, escapeHtml, FONT } from "@/lib/mail/send";
+import { isDeployed } from "@/lib/stage";
 
 const BRAND = "#5f47eb";
 const BRAND_TINT = "#efecfd";
@@ -131,7 +132,7 @@ export async function sendOtpEmail(
 
   if (sent) return;
 
-  if (process.env.NODE_ENV === "production") {
+  if (isDeployed) {
     throw new Error(
       "RESEND_API_KEY is missing. Refusing to sign anyone in without delivering the code.",
     );

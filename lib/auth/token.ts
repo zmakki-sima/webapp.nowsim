@@ -4,6 +4,7 @@ import { EncryptJWT, jwtDecrypt } from "jose";
 import { z } from "zod";
 
 import { sessionKey } from "@/lib/auth/env";
+import { isDeployed } from "@/lib/stage";
 
 const payloadSchema = z.object({
   email: z.string().min(1),
@@ -28,13 +29,16 @@ export function isFresh(session: Session): boolean {
 
 const REFRESH_AFTER_MS = 60 * 60 * 1000;
 
-const production = process.env.NODE_ENV === "production";
-
-export const COOKIE = production ? "__Host-nowsim_session" : "nowsim_session";
+/**
+ * Every deployment is served over HTTPS, staging included, so the hardened
+ * cookie is keyed to being deployed rather than to being live. `__Host-`
+ * additionally requires `secure`, no `domain`, and `path=/` — all true here.
+ */
+export const COOKIE = isDeployed ? "__Host-nowsim_session" : "nowsim_session";
 
 export const cookieOptions = {
   httpOnly: true,
-  secure: production,
+  secure: isDeployed,
   sameSite: "lax",
   path: "/",
 } as const;

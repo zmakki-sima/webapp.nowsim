@@ -2,21 +2,23 @@ import "server-only";
 
 import { z } from "zod";
 
-const isProduction = process.env.NODE_ENV === "production";
+import { isLive } from "@/lib/stage";
 
 const required =
   "AUTH_EMAIL_FROM is required. Use an address on a domain verified in Resend";
 
 /**
  * The sandbox sender only reaches the Resend account owner and fails SPF/DKIM
- * everywhere else, so production has to name a domain we actually verified.
+ * everywhere else, so the live site has to name a domain we actually verified.
+ * Staging may keep the sandbox: its only recipient is us, which is exactly who
+ * a staging sign-in should reach.
  */
 const emailFrom = z
   .string({ error: required })
   .min(1, required)
   .refine(
-    (value) => !isProduction || !value.includes("@resend.dev"),
-    "AUTH_EMAIL_FROM must not use the Resend sandbox domain in production",
+    (value) => !isLive || !value.includes("@resend.dev"),
+    "AUTH_EMAIL_FROM must not use the Resend sandbox domain on the live site",
   );
 
 const schema = z.object({
@@ -30,7 +32,7 @@ const schema = z.object({
   UPSTASH_REDIS_REST_URL: z.url("UPSTASH_REDIS_REST_URL must be the REST URL, not the redis:// one"),
   UPSTASH_REDIS_REST_TOKEN: z.string().min(1),
   RESEND_API_KEY: z.string().min(1).optional(),
-  AUTH_EMAIL_FROM: isProduction
+  AUTH_EMAIL_FROM: isLive
     ? emailFrom
     : emailFrom.default("nowsim <onboarding@resend.dev>"),
 });
