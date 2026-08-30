@@ -24,7 +24,8 @@ const option = cn(
 /**
  * The flags are square rather than the usual 3:2 so that the circular crop
  * takes the middle of the design instead of shaving the hoist off, which is
- * where Bahrain's serration and the UAE's red bar live.
+ * where Bahrain's serration and the UAE's red bar live. Switzerland's is square
+ * to begin with, so it is the one drawn at its true proportions.
  */
 function Flag({ currency, className }: { currency: Currency; className?: string }) {
   return (

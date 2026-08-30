@@ -4,7 +4,7 @@
  * ever applied at the last moment — when a price is painted, or when Stripe is
  * told what to charge.
  */
-export const currencyCodes = ["EUR", "USD", "BHD", "AED"] as const;
+export const currencyCodes = ["EUR", "USD", "CHF", "BHD", "AED"] as const;
 
 export type Currency = (typeof currencyCodes)[number];
 
@@ -38,6 +38,7 @@ type CurrencyFacts = {
 export const currencies: Record<Currency, CurrencyFacts> = {
   EUR: { decimals: 2, rate: 1, step: 1, label: "Euro" },
   USD: { decimals: 2, rate: 1.08, step: 1, label: "US Dollar" },
+  CHF: { decimals: 2, rate: 0.94, step: 1, label: "Swiss Franc" },
   BHD: { decimals: 3, rate: 0.41, step: 10, label: "Bahraini Dinar" },
   AED: { decimals: 2, rate: 3.97, step: 1, label: "UAE Dirham" },
 };
@@ -91,9 +92,10 @@ function formatterFor(currency: Currency): Intl.NumberFormat {
 
 /**
  * `en-US` puts the euro and dollar signs in front of the digits but writes the
- * dinar and dirham as a leading code — `BHD 12.346`. Prices sit next to each
- * other in the catalog, so the mark is moved after the number for those two and
- * every price lines up on its first digit whichever currency is selected.
+ * franc, dinar and dirham as a leading code — `BHD 12.346`. Prices sit next to
+ * each other in the catalog, so the mark is moved after the number for those
+ * three and every price lines up on its first digit whichever currency is
+ * selected.
  *
  * Only the currency part is moved: the grouping and the decimal count still
  * come from `Intl`, which is what keeps the dinar at three places.
@@ -106,7 +108,7 @@ export function formatMoney({ amount, currency }: Money): string {
   const at = parts.findIndex((part) => part.type === "currency");
 
   // A *symbol* (€, $) is left where it is; only an alphabetic code is moved,
-  // which is the form the dinar and dirham take.
+  // which is the form the franc, dinar and dirham take.
   const moves =
     at !== -1 &&
     /^\p{L}+$/u.test(parts[at].value) &&
