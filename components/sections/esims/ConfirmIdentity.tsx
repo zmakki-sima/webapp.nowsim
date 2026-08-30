@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useActionState, useEffect, useState } from "react";
+import { useActionState, useEffect, useRef, useState } from "react";
 import { MdLockOutline } from "react-icons/md";
 
 import { confirmReauth, requestReauth, type ReauthState } from "@/app/actions/auth";
@@ -20,7 +20,16 @@ const button = cn(
   "w-full justify-center rounded-control px-5 py-3.5 text-base font-bold",
 );
 
-export function ConfirmIdentity() {
+export function ConfirmIdentity({
+  reason = "before showing it",
+  submitLabel = "Show install details",
+  onConfirmed,
+}: {
+  /** What the confirmation unlocks — the caller asked for it, not this dialog. */
+  reason?: string;
+  submitLabel?: string;
+  onConfirmed?: () => void;
+} = {}) {
   const router = useRouter();
   const [state, action, pending] = useActionState<ReauthState, FormData>(
     confirmReauth,
@@ -30,8 +39,19 @@ export function ConfirmIdentity() {
   const [sent, setSent] = useState<ReauthState | null>(null);
   const [code, setCode] = useState("");
 
+  // Held in a ref so a caller passing an inline closure does not re-run the
+  // effect below — that fires once, on the transition to confirmed.
+  const confirmed = useRef(onConfirmed);
+
   useEffect(() => {
-    if (state.ok) router.refresh();
+    confirmed.current = onConfirmed;
+  }, [onConfirmed]);
+
+  useEffect(() => {
+    if (!state.ok) return;
+
+    router.refresh();
+    confirmed.current?.();
   }, [state.ok, router]);
 
   async function send() {
@@ -54,7 +74,7 @@ export function ConfirmIdentity() {
 
         <p className="text-sm text-muted">
           Anyone with the activation code can install this eSIM, so we check it
-          is you before showing it.
+          is you {reason}.
         </p>
 
         <Pressable
@@ -116,7 +136,7 @@ export function ConfirmIdentity() {
             pending ? lightTone.inert : lightTone.primary,
           )}
         >
-          {pending ? "Checking…" : "Show install details"}
+          {pending ? "Checking…" : submitLabel}
         </Pressable>
       ) : null}
     </form>

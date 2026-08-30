@@ -60,17 +60,28 @@ export function InstallDialog({
   esim,
   open,
   onClose,
+  confirm,
 }: {
   esim: Esim;
   open: boolean;
   onClose: () => void;
+  /**
+   * Set when the dialog was opened by something other than "Install details" —
+   * a resend that needed a fresh session. Without it a confirmed code drops the
+   * customer into install details, which is not what they asked for.
+   */
+  confirm?: {
+    reason: string;
+    submitLabel: string;
+    onConfirmed: () => void;
+  };
 }) {
   const title = esim.plan ? `${esim.plan.destination} eSIM` : "Your eSIM";
 
-  if (esim.installLocked) {
+  if (esim.installLocked || confirm) {
     return (
       <Dialog open={open} onClose={onClose} title={title}>
-        <ConfirmIdentity />
+        <ConfirmIdentity {...confirm} />
       </Dialog>
     );
   }

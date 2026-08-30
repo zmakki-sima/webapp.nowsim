@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import {
   MdAdd,
   MdCheck,
@@ -77,8 +77,17 @@ export function EsimCard({ esim }: { esim: Esim }) {
   const [installing, setInstalling] = useState(false);
   const [mailing, setMailing] = useState(false);
   const [mail, setMail] = useState<MailState | null>(null);
+  // A resend can be interrupted by a stale session. The dialog it borrows is
+  // the install one, so remember whose confirmation this is — otherwise a
+  // correct code lands the customer in install details they never asked for.
+  const [confirmingMail, setConfirmingMail] = useState(false);
 
   const { plan, usage, state } = esim;
+
+  // Sticky for the life of the page. A mail that has left is not worth sending
+  // twice, and the send is rate limited on the server regardless — the button
+  // should stop asking rather than let someone lean on it.
+  const sent = Boolean(mail?.ok);
 
   const spent = usage ? Math.round((usage.usedMb / usage.totalMb) * 100) : 0;
 
@@ -93,15 +102,12 @@ export function EsimCard({ esim }: { esim: Esim }) {
   // sends them there with the plan browser open.
   const expired = state === "expired";
 
-  useEffect(() => {
-    if (!mail?.ok) return;
-
-    const timer = setTimeout(() => setMail(null), 6000);
-
-    return () => clearTimeout(timer);
-  }, [mail]);
-
-  async function sendEmail() {
+  /**
+   * `retry` marks the send that follows a confirmation. A second lock there
+   * would mean the fresh session did not take, so it reports the failure rather
+   * than reopening the dialog the customer just cleared.
+   */
+  async function sendEmail(retry = false) {
     setMailing(true);
     setMail(null);
 
@@ -110,12 +116,27 @@ export function EsimCard({ esim }: { esim: Esim }) {
     setMailing(false);
 
     if (result.locked) {
+      if (retry) {
+        setMail({ ok: false, error: "We could not confirm it was you. Try again." });
+
+        return;
+      }
+
+      setConfirmingMail(true);
       setInstalling(true);
 
       return;
     }
 
     setMail(result);
+  }
+
+  // The code checked out, so finish the send that was interrupted and close the
+  // dialog behind it. The customer asked for an email, not for a QR code.
+  function onMailConfirmed() {
+    setConfirmingMail(false);
+    setInstalling(false);
+    void sendEmail(true);
   }
 
   return (
@@ -237,30 +258,48 @@ export function EsimCard({ esim }: { esim: Esim }) {
                 re-sending the install mail has nothing left to tell them. */}
             {!expired && (
               <Pressable
-                onClick={sendEmail}
-                disabled={mailing || mail?.ok}
+                onClick={() => void sendEmail()}
+                disabled={mailing || sent}
+                /* Stays disabled for the life of the page: one mail per visit
+                   is enough, and the confirmation reads as spent rather than
+                   as a button asking to be pressed again. */
+                title={
+                  sent && mail?.email
+                    ? mail.throttled
+                      ? `Already sent to ${mail.email}. Check your inbox.`
+                      : `Install details sent to ${mail.email}.`
+                    : undefined
+                }
                 className={cn(
-                  mailing || mail?.ok ? quiet : secondary,
+                  mailing || sent ? quiet : secondary,
                   "gap-2 sm:ml-auto",
                 )}
               >
-                {mail?.ok ? (
+                {sent ? (
                   <MdCheck aria-hidden className="h-4 w-4" />
                 ) : (
                   <MdMailOutline aria-hidden className="h-4 w-4" />
                 )}
-                {mail?.ok ? "Sent" : mailing ? "Sending…" : "Resend email"}
+                {sent
+                  ? mail?.throttled
+                    ? "Already sent"
+                    : "Sent"
+                  : mailing
+                    ? "Sending…"
+                    : "Resend email"}
               </Pressable>
             )}
           </>
         )}
       </div>
 
-      {mail?.ok && mail.email ? (
-        <p className="mt-3 text-sm text-muted">
+      {/* Announced only — the visible confirmation is the button itself, which
+          a screen reader will not re-read when its label swaps to "Sent". */}
+      {sent && mail?.email ? (
+        <p role="status" className="sr-only">
           {mail.throttled
-            ? `Already sent to ${mail.email}. Check your inbox`
-            : `Install details sent to ${mail.email}`}
+            ? `Already sent to ${mail.email}. Check your inbox.`
+            : `Install details sent to ${mail.email}.`}
         </p>
       ) : null}
 
@@ -273,7 +312,19 @@ export function EsimCard({ esim }: { esim: Esim }) {
       <InstallDialog
         esim={esim}
         open={installing}
-        onClose={() => setInstalling(false)}
+        onClose={() => {
+          setInstalling(false);
+          setConfirmingMail(false);
+        }}
+        confirm={
+          confirmingMail
+            ? {
+                reason: "before emailing it again",
+                submitLabel: "Send the email",
+                onConfirmed: onMailConfirmed,
+              }
+            : undefined
+        }
       />
     </li>
   );
