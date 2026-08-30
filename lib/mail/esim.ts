@@ -237,6 +237,42 @@ function cardTitle(title: string, note?: string): string {
                   </tr>`;
 }
 
+/**
+ * Left-aligned card title, for a card holding a single value rather than a
+ * centred figure. Centring a short label above a full-width tinted box leaves
+ * the two reading as unrelated blocks.
+ */
+function cardTitleLeft(title: string, note?: string): string {
+  return `<tr>
+                    <td align="left" style="${FONT};padding:20px 24px 0;font-size:15px;font-weight:700;color:${INK}">
+                      ${title}
+                      ${note ? `<span style="font-weight:400;color:${MUTED}">&nbsp;${note}</span>` : ""}
+                    </td>
+                  </tr>`;
+}
+
+/**
+ * A single labelled value, label stacked over value on one left edge.
+ *
+ * The two-column dataRow below is for a label that heads several lines of
+ * values; with one short value it strands the label and the value at opposite
+ * sides of the box.
+ */
+function stackedRow(label: string, text: string): string {
+  return `<tr>
+                    <td style="padding:14px 24px 20px">
+                      <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" style="background:${FOOTER_TINT}">
+                        <tr>
+                          <td style="${FONT};padding:14px 18px;font-size:13px;line-height:1.6;color:${MUTED}">
+                            ${label}
+                            <span style="display:block;font-size:15px;font-weight:700;color:${INK};word-break:break-all;padding-top:3px">${escapeHtml(text)}</span>
+                          </td>
+                        </tr>
+                      </table>
+                    </td>
+                  </tr>`;
+}
+
 /** One labelled column of copyable values inside the manual card. */
 function dataRow(label: string, values: string, last: boolean): string {
   return `<tr>
@@ -787,8 +823,8 @@ function topUpBody(esim: Esim, email: string) {
             </tr>
 
             ${card(
-              `${cardTitle("Added to the eSIM ending", escapeHtml(tail))}
-                  ${dataRow("ICCID", value(esim.iccid), true)}`,
+              `${cardTitleLeft("Added to the eSIM ending", escapeHtml(tail))}
+                  ${stackedRow("ICCID", esim.iccid)}`,
               24,
             )}
 
