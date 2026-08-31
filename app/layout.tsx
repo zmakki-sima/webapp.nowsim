@@ -1,4 +1,5 @@
 import { Analytics } from "@vercel/analytics/next";
+import { SpeedInsights } from "@vercel/speed-insights/next";
 import type { Metadata } from "next";
 import localFont from "next/font/local";
 
@@ -89,10 +90,12 @@ export default function RootLayout({
       <body className="min-h-full flex flex-col">
         <SessionProvider account={getAccount()}>{children}</SessionProvider>
         {/*
-         * Injects the Web Analytics script. It only actually loads on Vercel
-         * deployments — locally it no-ops rather than sending fake page views.
+         * Injects the Web Analytics and Speed Insights scripts. Both only
+         * report from Vercel deployments — locally they no-op rather than
+         * sending fake page views or Core Web Vitals samples.
          */}
         <Analytics />
+        <SpeedInsights />
       </body>
     </html>
   );
