@@ -9,7 +9,7 @@ import { Dialog } from "@/components/ui/Dialog";
 import { Pressable } from "@/components/ui/Pressable";
 import type { InstallChoice } from "@/lib/checkout";
 import { cn } from "@/lib/cn";
-import { formatSlashDay } from "@/lib/units";
+import { esimStateLabels, type EsimState } from "@/lib/types";
 
 // Purple is reserved for what the customer can act on, so the panels behind the
 // buttons stay neutral instead of tinting the whole dialog one shade.
@@ -20,13 +20,20 @@ const action = cn(
   "text-base font-bold tracking-[-0.01em]",
 );
 
-function statusOf({ state, expiresAt }: InstallTarget): string {
-  if (!expiresAt) return "No plan on this eSIM";
+// The same state pill the eSIM list uses, so a card reads the same in both
+// places. Sized down a step: this list is denser than the cards on /esims.
+const pill = cn(
+  "shrink-0 rounded-full px-2 py-0.5",
+  "text-[0.75rem]/[1rem] font-bold",
+);
 
-  const when = formatSlashDay(expiresAt);
-
-  return state === "expired" ? `Expired ${when}` : `Active until ${when}`;
-}
+const pillTone: Record<EsimState, string> = {
+  installed: "bg-success/12 text-success",
+  issued: "bg-ink/8 text-muted",
+  ready: "bg-brand/15 text-brand",
+  expired: "bg-ink/8 text-muted",
+  removed: "bg-danger/15 text-danger",
+};
 
 function Art({ src, size }: { src?: string; size: string }) {
   return (
@@ -91,7 +98,7 @@ export function InstallChoiceDialog({
       title="Where should this plan go?"
       width="max-w-[30rem]"
     >
-      <div className="mt-2 flex flex-col overflow-y-auto scroll-slim">
+      <div className="mt-2 flex min-h-0 flex-col">
         <div className={cn(block, "mt-3 bg-ink/[0.04]")}>
           <h3 className="text-base font-bold tracking-[-0.01em]">
             Issue a new eSIM
@@ -124,7 +131,7 @@ export function InstallChoiceDialog({
               <span className="h-px flex-1 bg-hairline" />
             </p>
 
-            <div className={cn(block, "bg-ink/[0.04]")}>
+            <div className={cn(block, "flex min-h-0 flex-col bg-ink/[0.04]")}>
               <h3 className="text-base font-bold tracking-[-0.01em]">
                 Add a new plan to an existing eSIM
               </h3>
@@ -141,7 +148,18 @@ export function InstallChoiceDialog({
                 </p>
               )}
 
-              <fieldset className="mt-4 flex flex-col gap-2.5">
+              {/*
+                The list is the only part that scrolls. Capped at roughly three
+                and a half rows so a long list is visibly cut mid-row — an
+                invitation to scroll — while the buttons either side of it stay
+                where they are. `pr-1` keeps the focus ring clear of the bar.
+              */}
+              <fieldset
+                className={cn(
+                  "mt-4 flex min-h-0 flex-col gap-2.5",
+                  targets.length > 3 && "max-h-[15rem] overflow-y-auto pr-1 scroll-slim",
+                )}
+              >
                 <legend className="sr-only">Choose an eSIM</legend>
 
                 {targets.map((entry) => {
@@ -152,7 +170,7 @@ export function InstallChoiceDialog({
                       key={entry.iccid}
                       className={cn(
                         "flex cursor-pointer items-center gap-3.5",
-                        "rounded-control p-3",
+                        "rounded-control px-3 py-4",
                         "transition-colors duration-300 ease-hover",
                         "motion-reduce:transition-none",
                         "has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-brand",
@@ -168,16 +186,18 @@ export function InstallChoiceDialog({
                         className="sr-only"
                       />
 
-                      <Art src={entry.art} size="mt-0.5 h-10 w-10 self-start" />
+                      <Art src={entry.art} size="h-10 w-10" />
 
                       <span className="min-w-0 flex-1">
-                        <span className="block truncate text-base font-bold tracking-[-0.01em]">
-                          {entry.name}
+                        <span className="flex min-w-0 items-center gap-2">
+                          <span className="truncate text-base font-bold tracking-[-0.01em]">
+                            {entry.name}
+                          </span>
+                          <span className={cn(pill, pillTone[entry.state])}>
+                            {esimStateLabels[entry.state]}
+                          </span>
                         </span>
                         <span className="mt-1 block truncate text-sm text-muted">
-                          {statusOf(entry)}
-                        </span>
-                        <span className="mt-0.5 block truncate text-xs text-muted">
                           ICCID: {entry.iccid}
                         </span>
                       </span>
@@ -185,10 +205,17 @@ export function InstallChoiceDialog({
                       <span
                         aria-hidden
                         className={cn(
-                          "mt-0.5 h-5 w-5 shrink-0 self-start rounded-full border-2",
-                          on ? "border-brand bg-brand" : "border-ink/25 bg-transparent",
+                          "flex h-5 w-5 shrink-0 items-center justify-center",
+                          "rounded-full",
+                          on
+                            ? "border-2 border-brand bg-brand"
+                            : "border border-ink/25 bg-transparent",
                         )}
-                      />
+                      >
+                        {on && (
+                          <span className="h-2 w-2 rounded-full bg-surface" />
+                        )}
+                      </span>
                     </label>
                   );
                 })}

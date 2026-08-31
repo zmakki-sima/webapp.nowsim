@@ -37,13 +37,16 @@ export type InstallTarget = {
  *
  * `null` means the lookup itself failed. That is deliberately not the same as an
  * empty list: reporting a Yesim outage as "you own no eSIMs" silently removes a
- * choice the customer actually has.
+ * choice the customer actually has. A session that has gone stale between the
+ * page render and this call is the same kind of unknown — the page still shows
+ * the customer signed in, so answering "no eSIMs" would skip the dialog for an
+ * account that owns several.
  */
 export async function listInstallTargets(): Promise<InstallTarget[] | null> {
   try {
     const esims = await getEsims();
 
-    if (!esims) return [];
+    if (!esims) return null;
 
     return esims
       .filter((esim) => esim.state !== "removed" && esim.iccid !== "")

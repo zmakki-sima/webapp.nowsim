@@ -72,6 +72,13 @@ export function PaymentStep({
   /** The account may well own eSIMs; we could not find out. */
   const unknown = mine === null;
 
+  /**
+   * The lookup has not answered for this account yet. Distinct from an answer of
+   * "none": both leave `targets` empty, and paying on the strength of that would
+   * skip the dialog for an account that does own eSIMs.
+   */
+  const pending = choosable && loaded?.owner !== accountId;
+
   const choice = picked?.owner === accountId ? picked.choice : null;
 
   useEffect(() => {
@@ -108,6 +115,10 @@ export function PaymentStep({
   }
 
   function pay() {
+    // Still waiting on the eSIM list: an empty `targets` here means "not yet",
+    // not "none", so there is nothing to decide from.
+    if (pending) return;
+
     // A failed lookup still opens the dialog, which says so, rather than
     // quietly deciding on the customer's behalf that a new eSIM is the only way.
     if ((targets.length > 0 || unknown) && !choice) {
@@ -151,7 +162,7 @@ export function PaymentStep({
 
       <Pressable
         onClick={pay}
-        disabled={locked || leaving}
+        disabled={locked || leaving || pending}
         aria-haspopup={targets.length > 0 || unknown ? "dialog" : undefined}
         aria-expanded={targets.length > 0 || unknown ? choosing : undefined}
         aria-describedby={locked ? hintId : undefined}
@@ -175,21 +186,9 @@ export function PaymentStep({
           Sign in above to complete your order.
         </p>
       ) : (
-        <>
-          {choice && (
-            <p className="mt-3 text-center text-sm text-muted">
-              Installing to{" "}
-              <span className="font-bold text-ink">
-                {choice.kind === "new" ? "a new eSIM" : choice.name}
-              </span>
-            </p>
-          )}
-
-          <p className="mt-3 text-center text-sm text-muted">
-            You&rsquo;ll be charged {total} once. No subscription, no
-            auto-renew.
-          </p>
-        </>
+        <p className="mt-3 text-center text-sm text-muted">
+          You&rsquo;ll be charged {total} once. No subscription, no auto-renew.
+        </p>
       )}
 
       {choosable && (
