@@ -138,7 +138,6 @@ export async function verifyOtp(
     await createSession({
       email: email.data,
       yesimUserId: userId,
-      provider: "email",
     });
 
     return {
@@ -146,7 +145,6 @@ export async function verifyOtp(
       account: {
         userId,
         email: email.data,
-        provider: "email",
       },
     };
   } catch (cause) {

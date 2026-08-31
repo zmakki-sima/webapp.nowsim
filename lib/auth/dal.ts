@@ -24,6 +24,5 @@ export const getAccount = cache(async (): Promise<Account | null> => {
   return {
     userId: session.yesimUserId,
     email: session.email,
-    provider: session.provider,
   };
 });

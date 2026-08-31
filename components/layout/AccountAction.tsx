@@ -16,11 +16,10 @@ import { SignInDialog } from "@/components/layout/SignInDialog";
 import { useAccount, useSetAccount } from "@/components/layout/SessionProvider";
 import { Dialog } from "@/components/ui/Dialog";
 import { Pressable } from "@/components/ui/Pressable";
-import { providerNames } from "@/lib/auth/providers";
 import { cn } from "@/lib/cn";
 
 const trigger = cn(
-  "rounded-full bg-brand/12 px-4 py-2.5 md:px-5",
+  "shrink-0 rounded-full bg-brand/12 px-3 py-2.5 sm:px-4 md:px-5",
   "text-base font-semibold text-brand",
   "hover:bg-brand/20 active:bg-brand/20",
 );
@@ -242,8 +241,7 @@ export function AccountAction() {
         </div>
 
         <p className="mt-2 text-sm text-muted">
-          Signed in via {providerNames[account.provider]}. Your eSIM, QR code
-          and receipt go to this address.
+          Your eSIM, QR code and receipt go to this address.
         </p>
 
         <div className="mt-4">

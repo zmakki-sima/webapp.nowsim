@@ -9,7 +9,6 @@ import { isDeployed } from "@/lib/stage";
 const payloadSchema = z.object({
   email: z.string().min(1),
   yesimUserId: z.string().min(1),
-  provider: z.enum(["google", "email"]),
   issuedAt: z.number().int().positive(),
   authAt: z.number().int().positive(),
   sid: z.string().min(1),

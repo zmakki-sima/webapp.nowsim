@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useTransition } from "react";
-import { MdPerson } from "react-icons/md";
+import { MdOutlineMail, MdPerson } from "react-icons/md";
 
 import { signOut } from "@/app/actions/auth";
 import { EmailSignIn, lightTone } from "@/components/auth/EmailSignIn";
@@ -10,20 +10,13 @@ import { Step } from "@/components/sections/checkout/Step";
 import { Pressable } from "@/components/ui/Pressable";
 import { useRouter } from "next/navigation";
 import type { Account } from "@/lib/auth/account";
-import { authProviders, legalLinks } from "@/lib/auth/providers";
-import type { ProviderId } from "@/lib/auth/providers";
+import { legalLinks } from "@/lib/auth/providers";
 import { cn } from "@/lib/cn";
 
-const tones: Record<ProviderId, string> = {
-  google:
-    "border border-hairline hover:border-ink/25 hover:bg-surface-soft active:bg-surface-soft",
-  email:
-    "border border-hairline hover:border-ink/25 hover:bg-surface-soft active:bg-surface-soft",
-};
-
-const providerButton = cn(
+const signInButton = cn(
   "w-full gap-3 rounded-full px-5 py-3.5",
   "text-base font-bold tracking-[-0.01em]",
+  "border border-hairline hover:border-ink/25 hover:bg-surface-soft active:bg-surface-soft",
 );
 
 function Legal() {
@@ -132,20 +125,12 @@ function SignedOut() {
         one as you go. Either takes a tap.
       </p>
 
-      <ul className="mt-6 flex flex-col gap-3">
-        {authProviders.map((provider) => (
-          <li key={provider.id}>
-            <Pressable
-              onClick={provider.ready ? () => setEmail(true) : undefined}
-              disabled={!provider.ready}
-              className={cn(providerButton, tones[provider.id])}
-            >
-              <provider.Icon aria-hidden className="h-5 w-5 shrink-0" />
-              {provider.label}
-            </Pressable>
-          </li>
-        ))}
-      </ul>
+      <div className="mt-6">
+        <Pressable onClick={() => setEmail(true)} className={signInButton}>
+          <MdOutlineMail aria-hidden className="h-5 w-5 shrink-0" />
+          Continue with Email
+        </Pressable>
+      </div>
 
       <Legal />
     </>

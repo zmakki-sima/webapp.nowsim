@@ -6,15 +6,14 @@ import { useCallback, useState } from "react";
 import { EmailSignIn, lightTone } from "@/components/auth/EmailSignIn";
 import { Dialog } from "@/components/ui/Dialog";
 import { Pressable } from "@/components/ui/Pressable";
-import { authProviders, legalLinks } from "@/lib/auth/providers";
+import { legalLinks } from "@/lib/auth/providers";
 import { cn } from "@/lib/cn";
-
-const providers = authProviders;
+import { MdOutlineMail } from "react-icons/md";
 
 const tone = lightTone.primary;
 
-// Spacing is left to the caller: the provider list needs a full gap above this,
-// while inside the email form it rides the form's own `gap-3`.
+// Spacing is left to the caller: the sign-in button needs a full gap above
+// this, while inside the email form it rides the form's own `gap-3`.
 function Legal({ className }: { className?: string }) {
   return (
     <p
@@ -102,24 +101,19 @@ export function SignInDialog({
         </div>
       ) : (
         <>
-          <ul className="mt-6 flex flex-col gap-3">
-            {providers.map((provider) => (
-              <li key={provider.id}>
-                <Pressable
-                  onClick={provider.ready ? () => setEmail(true) : undefined}
-                  disabled={!provider.ready}
-                  className={cn(
-                    "w-full gap-3 rounded-full px-5 py-3.5",
-                    "text-base font-bold tracking-[-0.01em]",
-                    provider.ready ? tone : lightTone.inert,
-                  )}
-                >
-                  <provider.Icon aria-hidden className="h-5 w-5 shrink-0" />
-                  {provider.label}
-                </Pressable>
-              </li>
-            ))}
-          </ul>
+          <div className="mt-6">
+            <Pressable
+              onClick={() => setEmail(true)}
+              className={cn(
+                "w-full gap-3 rounded-full px-5 py-3.5",
+                "text-base font-bold tracking-[-0.01em]",
+                tone,
+              )}
+            >
+              <MdOutlineMail aria-hidden className="h-5 w-5 shrink-0" />
+              Continue with Email
+            </Pressable>
+          </div>
 
           <Legal className="mt-6" />
         </>
