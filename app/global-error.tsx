@@ -1,13 +1,18 @@
 "use client";
 
+import { useReportError } from "@/components/common/useReportError";
+
 import "./globals.css";
 
 export default function GlobalError({
+  error,
   unstable_retry,
 }: {
   error: Error & { digest?: string };
   unstable_retry: () => void;
 }) {
+  useReportError(error, "global");
+
   return (
     <html lang="en" className="h-full antialiased">
       <body className="flex min-h-full flex-col items-center justify-center gap-6 px-6 text-center">

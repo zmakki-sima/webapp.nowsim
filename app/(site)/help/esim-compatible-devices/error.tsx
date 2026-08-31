@@ -5,14 +5,18 @@ import {
   routeMessageAction,
   routeMessageActionQuiet,
 } from "@/components/common/RouteMessage";
+import { useReportError } from "@/components/common/useReportError";
 import { Pressable } from "@/components/ui/Pressable";
 
 export default function CompatibleDevicesError({
+  error,
   unstable_retry,
 }: {
   error: Error & { digest?: string };
   unstable_retry: () => void;
 }) {
+  useReportError(error, "compatible-devices");
+
   return (
     <RouteMessage
       className="pt-40 md:pt-48"
