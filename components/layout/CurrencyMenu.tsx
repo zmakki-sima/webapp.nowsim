@@ -10,7 +10,7 @@ import { currencies, currencyCodes, type Currency } from "@/lib/money";
 import { cn } from "@/lib/cn";
 
 const trigger = cn(
-  "gap-1.5 rounded-full px-3 py-2 md:px-3.5 md:py-2.5",
+  "shrink-0 gap-1 rounded-full px-2 py-2 sm:gap-1.5 sm:px-3 md:px-3.5 md:py-2.5",
   "text-base font-medium",
   "bg-brand/6 hover:bg-brand/12 active:bg-brand/12",
 );

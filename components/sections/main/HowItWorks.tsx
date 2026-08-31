@@ -158,7 +158,7 @@ export function HowItWorks() {
                       alt={step.image.alt}
                       width={step.image.width}
                       height={step.image.height}
-                      quality={100}
+                      quality={90}
                       sizes="(min-width: 1024px) 368px, (min-width: 768px) 34vw, 80vw"
                       className="h-auto w-full max-w-[23rem] rounded-t-screen-lg"
                     />

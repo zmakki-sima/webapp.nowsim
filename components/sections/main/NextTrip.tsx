@@ -24,7 +24,10 @@ export function NextTrip({
           id="next-trip-heading"
           className={cn(
             "font-display font-extrabold uppercase tracking-[-0.03em]",
-            "whitespace-nowrap text-[clamp(1.125rem,5.2vw,3.5rem)] leading-[1.03]",
+            // The line is kept on one row by choice, but only where it fits:
+            // below the container's own padding the clamp floor is wider than
+            // the screen, so let it wrap rather than overflow.
+            "text-[clamp(1.125rem,5.2vw,3.5rem)] leading-[1.03] min-[360px]:whitespace-nowrap",
           )}
         >
           Where&rsquo;s life taking you{" "}

@@ -5,13 +5,27 @@ import { useRef, type KeyboardEvent, type ReactNode } from "react";
 import { Pressable } from "@/components/ui/Pressable";
 import { cn } from "@/lib/cn";
 
+/*
+ * The strip is a single unwrapped row, so on a narrow screen its intrinsic
+ * width can exceed the viewport. Left to itself that widens the document and
+ * drags every `fixed` element (the header, the menu overlay) out with it, so
+ * the whole page scrolls sideways. `max-w-full` + `overflow-x-auto` keeps the
+ * row inside its column and lets the tabs scroll on their own instead.
+ *
+ * `flex` rather than `inline-flex`: an inline-flex box is sized from its
+ * content and would ignore the cap. `w-fit` restores the hug once there is
+ * room, so the pill border still wraps the tabs on desktop.
+ */
 const list = cn(
-  "inline-flex items-center gap-1 rounded-full p-1",
+  "flex w-fit max-w-full items-center gap-1 rounded-full p-1",
+  "overflow-x-auto overscroll-x-contain scroll-none",
   "border border-hairline bg-surface",
 );
 
-const tab =
-  "gap-2 rounded-full px-5 py-2.5 text-base font-semibold md:px-6 md:py-3";
+const tab = cn(
+  "shrink-0 gap-2 rounded-full px-5 py-2.5 text-base font-semibold",
+  "md:px-6 md:py-3",
+);
 
 const tabActive = "bg-brand/12 text-brand";
 
@@ -77,7 +91,7 @@ export function Tabs<Id extends string>({
       role="tablist"
       aria-label={label}
       onKeyDown={onKeyDown}
-      className={cn(list, fill && "flex w-full", className)}
+      className={cn(list, fill && "w-full", className)}
     >
       {items.map((item) => {
         const selected = item.id === value;
@@ -96,7 +110,8 @@ export function Tabs<Id extends string>({
             onClick={() => onChange(item.id)}
             className={cn(
               tab,
-              fill && "flex-1",
+              // Filled tabs share the row, so they must be allowed to shrink.
+              fill && "min-w-0 flex-1 shrink",
               selected ? tabActive : tabIdle,
             )}
           >

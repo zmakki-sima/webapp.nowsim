@@ -107,7 +107,7 @@ export function AllDestinations({
           label="Destination type"
           tabId={(id) => `all-destinations-tab-${id}`}
           panelId="all-destinations-panel"
-          className="w-fit shrink-0"
+          className="min-w-0 shrink-0 md:w-fit"
         />
       </div>
 
@@ -124,7 +124,7 @@ export function AllDestinations({
         {results.length ? (
           <>
             {direct.length ? (
-              <ul className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3 lg:gap-4">
+              <ul className="grid grid-cols-[minmax(0,1fr)] gap-3 sm:grid-cols-[repeat(2,minmax(0,1fr))] lg:grid-cols-[repeat(3,minmax(0,1fr))] lg:gap-4">
                 {direct.map(({ destination }) => (
                   <li key={`${destination.kind}/${destination.slug}`}>
                     <DestinationCard destination={destination} />
@@ -139,7 +139,7 @@ export function AllDestinations({
                   Other plans
                 </h2>
 
-                <ul className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-3 lg:gap-4">
+                <ul className="mt-4 grid grid-cols-[minmax(0,1fr)] gap-3 sm:grid-cols-[repeat(2,minmax(0,1fr))] lg:grid-cols-[repeat(3,minmax(0,1fr))] lg:gap-4">
                   {covering.map(({ destination, coverageHits }) => (
                     <li key={`${destination.kind}/${destination.slug}`}>
                       <DestinationCard

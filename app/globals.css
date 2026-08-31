@@ -34,7 +34,12 @@
     var(--font-figtree), var(--font-satoshi), ui-sans-serif, system-ui,
     sans-serif;
 
-  --text-display: clamp(2.75rem, 1.6rem + 5.6vw, 5.5rem);
+  /*
+   * The floor is sized so the longest unbreakable word in the hero
+   * ("WHENEVER’S") still fits a 320px screen: at ~0.62em per character a
+   * 2.75rem floor overflowed its line box and was clipped. 2rem clears it.
+   */
+  --text-display: clamp(2rem, 1.1rem + 5.6vw, 5.5rem);
   --text-display--line-height: 0.95;
   --text-display--letter-spacing: -0.045em;
   --text-display--font-weight: 700;

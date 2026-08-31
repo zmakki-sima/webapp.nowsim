@@ -37,7 +37,10 @@ export function TrustBar({
   return (
     <ul
       className={cn(
-        "mx-auto grid w-full max-w-xl grid-cols-2",
+        // One column on the narrowest phones: two 132px cells cannot hold
+        // labels like "One price, everywhere" without spilling.
+        "mx-auto grid w-full max-w-xl grid-cols-[minmax(0,1fr)]",
+        "min-[400px]:grid-cols-[repeat(2,minmax(0,1fr))]",
         "lg:flex lg:max-w-none lg:justify-center",
         onVideo
           ? "gap-x-6 gap-y-4 lg:gap-x-10"
@@ -46,10 +49,10 @@ export function TrustBar({
       )}
     >
       {trustPoints.map(({ icon: Icon, label, iconClassName }) => (
-        <li key={label} className="flex items-center gap-3 text-left">
+        <li key={label} className="flex min-w-0 items-center gap-3 text-left">
           <span
             className={cn(
-              "flex h-10 shrink-0 items-center justify-center rounded-full px-5",
+              "flex h-10 shrink-0 items-center justify-center rounded-full px-4 lg:px-5",
               onVideo
                 ? "border border-white/25 bg-white/10 backdrop-blur-sm"
                 : "border border-hairline bg-surface-soft",
@@ -67,7 +70,9 @@ export function TrustBar({
 
           <span
             className={cn(
-              "text-base font-semibold",
+              // min-w-0 so a long label wraps inside the grid cell rather than
+              // pushing the row past a narrow viewport.
+              "min-w-0 text-base font-semibold",
               onVideo ? "text-white" : "text-ink",
             )}
           >

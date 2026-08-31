@@ -42,7 +42,7 @@ export function MenuToggle({
       aria-expanded={open}
       aria-controls={panelId}
       hit
-      className="-m-2 rounded-full p-2 hover:bg-brand/6 active:bg-brand/10 md:hidden"
+      className="-m-2 rounded-full p-2 hover:bg-brand/6 active:bg-brand/10 lg:hidden"
     >
       <ToggleIcon open={open} />
       <span className="sr-only">{open ? "Close menu" : "Open menu"}</span>
@@ -69,7 +69,7 @@ export function MenuPanel({
         aria-hidden
         onClick={onClose}
         className={cn(
-          "fixed inset-x-0 bottom-0 z-[56] cursor-default md:hidden",
+          "fixed inset-x-0 bottom-0 z-[56] cursor-default lg:hidden",
           belowBar,
           open ? "visible" : "invisible",
         )}
@@ -79,7 +79,7 @@ export function MenuPanel({
         id={panelId}
         inert={!open}
         className={cn(
-          "fixed inset-x-0 z-[57] px-3 pb-3 md:hidden",
+          "fixed inset-x-0 z-[57] px-3 pb-3 lg:hidden",
           belowBar,
           "transition-[transform,opacity,visibility]",
           "[transition-duration:300ms,150ms,300ms]",

@@ -97,7 +97,8 @@ export function PlanPicker({
           tabbed && "justify-between",
         )}
       >
-        <h2 className="min-w-[15rem] flex-1 text-xl font-bold tracking-[-0.02em]">
+        {/* A 15rem floor left no room for the tabs beside it on a phone. */}
+        <h2 className="min-w-0 flex-1 text-xl font-bold tracking-[-0.02em] sm:min-w-[15rem]">
           {heading}
         </h2>
 
@@ -124,7 +125,7 @@ export function PlanPicker({
           Choose a data plan for {destinationName}
         </legend>
 
-        <ul className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+        <ul className="grid grid-cols-[minmax(0,1fr)] gap-3 sm:grid-cols-[repeat(2,minmax(0,1fr))] lg:grid-cols-[repeat(3,minmax(0,1fr))]">
           {shownPlans.map((plan) => {
             const inputId = `${groupId}-${plan.id}`;
             const picked = plan.id === selectedId;

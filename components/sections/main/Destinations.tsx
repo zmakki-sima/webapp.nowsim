@@ -29,7 +29,7 @@ export function Destinations({
     >
       <div className="mx-auto max-w-7xl">
         <div className="flex flex-col gap-8 md:flex-row md:items-end md:justify-between md:gap-10">
-          <div>
+          <div className="min-w-0">
             <h2
               id="destinations-heading"
               className={cn(
@@ -54,7 +54,7 @@ export function Destinations({
             label="Destination type"
             tabId={(id) => `destinations-tab-${id}`}
             panelId={(id) => `destinations-panel-${id}`}
-            className="shrink-0 self-start md:self-auto"
+            className="min-w-0 self-start md:self-auto"
           />
         </div>
 
@@ -64,7 +64,7 @@ export function Destinations({
           aria-labelledby={`destinations-tab-${active}`}
           className="mt-10 md:mt-14"
         >
-          <ul className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3 lg:gap-4">
+          <ul className="grid grid-cols-[minmax(0,1fr)] gap-3 sm:grid-cols-[repeat(2,minmax(0,1fr))] lg:grid-cols-[repeat(3,minmax(0,1fr))] lg:gap-4">
             {previews[active].map((destination) => (
               <li key={`${destination.kind}/${destination.slug}`}>
                 <DestinationCard destination={destination} />

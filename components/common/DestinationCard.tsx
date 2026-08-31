@@ -18,7 +18,10 @@ export function DestinationCard({
     <Pressable
       href={destinationHref(destination.kind, destination.slug)}
       className={cn(
-        "group w-full justify-start gap-4 rounded-card px-5 text-left",
+        // `min-w-0` matters: Pressable is inline-flex, which is sized from its
+        // content, so a long destination name would otherwise stretch the card
+        // past its grid track instead of truncating inside it.
+        "group w-full min-w-0 justify-start gap-4 rounded-card px-5 text-left",
         note ? "py-4 md:py-4" : "py-5 md:py-6",
         "bg-brand/4 hover:bg-brand/10 active:bg-brand/10",
       )}

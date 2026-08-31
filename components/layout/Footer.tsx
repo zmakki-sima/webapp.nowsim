@@ -168,9 +168,14 @@ export async function Footer() {
               </ul>
             </div>
 
-            <div className="flex flex-wrap gap-x-12 gap-y-8 md:shrink-0">
+            {/*
+              `shrink-0` held this row at its intrinsic width, which the long
+              support labels pushed past the viewport on tablets. It may shrink
+              now; the groups wrap and each keeps a sensible minimum instead.
+            */}
+            <div className="flex flex-wrap gap-x-12 gap-y-8">
               {groups.map((group) => (
-                <div key={group.title} className="min-w-36">
+                <div key={group.title} className="min-w-36 flex-1 md:flex-none">
                   <h3 className="text-eyebrow uppercase text-brand-invert">
                     {group.title}
                   </h3>

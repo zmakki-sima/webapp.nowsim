@@ -97,23 +97,34 @@ export function WebNavbar() {
             )}
           />
 
-          <div className="px-6 md:px-12">
+          {/* px-6 left only 272px of room at 320px, which the logo, currency
+              menu, account button and burger could not share. */}
+          <div className="px-4 sm:px-6 md:px-12">
             <div className="relative mx-auto flex h-(--header-height) max-w-7xl items-center justify-between">
               <Pressable
                 href="/"
                 hit
                 aria-label="nowsim home"
-                className="-m-2 shrink-0 rounded-full p-2"
+                className="-m-2 min-w-0 shrink rounded-full p-2"
               >
+                {/* The mark is ~6:1, so h-6 renders 162px wide — most of a
+                    320px screen once the action cluster is accounted for. */}
                 <NowsimLogo
                   id="nowsim-logo-header"
-                  className="h-6 w-auto text-brand md:h-7"
+                  className="h-5 w-auto max-w-full text-brand sm:h-6 md:h-7"
                 />
               </Pressable>
 
+              {/*
+                The nav is centred on the row rather than laid out between the
+                logo and the actions, so it overlaps them instead of pushing
+                them apart. At `md` the four links plus both side clusters do
+                not fit and "Help" ran under the currency menu; `lg` is the
+                first width where they clear each other.
+              */}
               <nav
                 aria-label="Main"
-                className="absolute left-1/2 hidden -translate-x-1/2 md:block"
+                className="absolute left-1/2 hidden -translate-x-1/2 lg:block"
               >
                 <ul className="flex items-center gap-1">
                   {navLinks.map((link) => (
@@ -133,7 +144,7 @@ export function WebNavbar() {
                 </ul>
               </nav>
 
-              <div className="flex items-center gap-2 md:gap-3">
+              <div className="flex min-w-0 shrink-0 items-center gap-1.5 sm:gap-2 md:gap-3">
                 <CurrencyMenu />
 
                 <Suspense fallback={<AccountActionFallback />}>
