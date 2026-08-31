@@ -124,10 +124,6 @@ not the eSIMs.
 could tick between the price on the plan card and the price on the payment page,
 and the customer would see two different numbers.
 
-**The Bahraini Dinar gets special handling.** It has three decimal places instead
-of two, and Stripe rejects certain three-decimal amounts, so prices are rounded to
-a step Stripe will accept rather than being silently altered at the till.
-
 **Very cheap plans can't be sold.** Card fees cost more than the smallest plans
 are worth, so Stripe refuses anything under roughly half a franc — 54 of the 1,520
 plans. The customer gets a clear message rather than an error.
@@ -141,18 +137,18 @@ so they're fast and cheap. Only accounts and checkout run live.
 
 ## 8. The tech stack
 
-| Piece | What it is | Why it's here |
-| --- | --- | --- |
-| **Next.js 16** + **React 19** | The web framework | Builds most pages ahead of time for speed, runs live code for accounts and checkout |
-| **TypeScript** | JavaScript with type checking | Catches whole categories of mistake before anything ships |
-| **Tailwind CSS v4** | Styling | Design written alongside the markup |
-| **Stripe** | Payments | Cards are typed on Stripe's page, never nowsim's — the lightest compliance tier there is |
-| **Yesim Partner API** | eSIM supplier | Catalog, eSIMs, data balances, device list |
-| **Upstash Redis** | Small fast store | Login codes, rate limits, orders, duplicate-payment guards |
-| **Resend** | Email | Login codes and the eSIM QR emails |
-| **Jose** | Encrypted session cookies | Proves who's signed in with no login database |
-| **Zod** | Data validation | Nothing from Yesim, the browser, or even the server's own config is trusted before it's checked |
-| **Vercel** | Hosting | Where it runs |
+| Piece                                     | What it is                    | Why it's here                                                                                   |
+| ----------------------------------------- | ----------------------------- | ----------------------------------------------------------------------------------------------- |
+| **Next.js 16** + **React 19** | The web framework             | Builds most pages ahead of time for speed, runs live code for accounts and checkout             |
+| **TypeScript**                      | JavaScript with type checking | Catches whole categories of mistake before anything ships                                       |
+| **Tailwind CSS v4**                 | Styling                       | Design written alongside the markup                                                             |
+| **Stripe**                          | Payments                      | Cards are typed on Stripe's page, never nowsim's — the lightest compliance tier there is       |
+| **Yesim Partner API**               | eSIM supplier                 | Catalog, eSIMs, data balances, device list                                                      |
+| **Upstash Redis**                   | Small fast store              | Login codes, rate limits, orders, duplicate-payment guards                                      |
+| **Resend**                          | Email                         | Login codes and the eSIM QR emails                                                              |
+| **Jose**                            | Encrypted session cookies     | Proves who's signed in with no login database                                                   |
+| **Zod**                             | Data validation               | Nothing from Yesim, the browser, or even the server's own config is trusted before it's checked |
+| **Vercel**                          | Hosting                       | Where it runs                                                                                   |
 
 **No traditional database.** Deliberate. Customers and eSIMs live at Yesim; nowsim
 keeps only short-lived things in Redis. Unpaid orders delete themselves after a
@@ -164,17 +160,17 @@ and can be revoked on sign-out.
 
 ## 9. How the code is organised
 
-| Folder | What's in it |
-| --- | --- |
-| `app/` | The pages — one folder per web address — plus checkout and the Stripe webhook |
-| `app/actions/` | Things the browser can ask the server to do: sign in, start a payment |
-| `components/` | Reusable interface pieces — buttons, dialogs, page sections |
-| `lib/api/` | Talking to Yesim and translating its data into ours |
-| `lib/auth/` | Sign-in: email codes, sessions, rate limits |
-| `lib/payments/` | Stripe, order records, and buying the eSIM after payment |
-| `lib/data/` | Fetching and caching the catalog, eSIMs and purchases |
-| `lib/mail/` | The emails, including the QR code one |
-| `public/` | Images, video, install screenshots |
+| Folder            | What's in it                                                                    |
+| ----------------- | ------------------------------------------------------------------------------- |
+| `app/`          | The pages — one folder per web address — plus checkout and the Stripe webhook |
+| `app/actions/`  | Things the browser can ask the server to do: sign in, start a payment           |
+| `components/`   | Reusable interface pieces — buttons, dialogs, page sections                    |
+| `lib/api/`      | Talking to Yesim and translating its data into ours                             |
+| `lib/auth/`     | Sign-in: email codes, sessions, rate limits                                     |
+| `lib/payments/` | Stripe, order records, and buying the eSIM after payment                        |
+| `lib/data/`     | Fetching and caching the catalog, eSIMs and purchases                           |
+| `lib/mail/`     | The emails, including the QR code one                                           |
+| `public/`       | Images, video, install screenshots                                              |
 
 ## 10. Where it stands
 
