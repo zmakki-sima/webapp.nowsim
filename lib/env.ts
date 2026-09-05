@@ -52,8 +52,8 @@ const schema = z.object({
 
 const parsed = schema.safeParse({
   YESIM_API_TOKEN: process.env.YESIM_API_TOKEN,
-  YESIM_API_BASE: process.env.YESIM_API_BASE,
-  REVALIDATE_SECRET: process.env.REVALIDATE_SECRET,
+  YESIM_API_BASE: process.env.YESIM_API_BASE || undefined,
+  REVALIDATE_SECRET: process.env.REVALIDATE_SECRET || undefined,
   NEXT_PUBLIC_SITE_URL: process.env.NEXT_PUBLIC_SITE_URL || undefined,
 });
 
