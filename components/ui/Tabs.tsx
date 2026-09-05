@@ -101,13 +101,31 @@ export function Tabs<Id extends string>({
     });
   }, []);
 
-  // A selected tab that starts out beyond the fold — "Global" arrived at from
-  // `?kind=global` — should be the one on screen, not the one off it.
+  // A selected tab that starts out beyond the end of the strip — "Global"
+  // arrived at from `?kind=global` — should be the one on screen, not the one
+  // off it.
+  //
+  // The strip is nudged by hand rather than with `scrollIntoView`: that call
+  // walks *every* scrollable ancestor up to the document, so on mount it
+  // scrolled the whole page down to wherever the tablist sat. On the home page
+  // that dropped the visitor past the hero before they had seen it.
   useEffect(() => {
-    tabRefs.current[value]?.scrollIntoView({
-      block: "nearest",
-      inline: "nearest",
-    });
+    const node = listRef.current;
+    const target = tabRefs.current[value];
+    if (!node || !target) return;
+
+    const strip = node.getBoundingClientRect();
+    const selected = target.getBoundingClientRect();
+
+    // The same "nearest" rule: move only far enough to uncover the tab.
+    const delta =
+      selected.left < strip.left
+        ? selected.left - strip.left
+        : selected.right > strip.right
+          ? selected.right - strip.right
+          : 0;
+
+    if (delta) node.scrollBy({ left: delta });
   }, [value]);
 
   useEffect(() => {
