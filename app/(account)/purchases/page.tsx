@@ -16,7 +16,7 @@ export default async function PurchasesPage() {
   if (!purchases) redirect("/");
 
   return (
-    <section className="px-3 pb-20 pt-28 md:px-4 md:py-28">
+    <section className="px-3 pb-20 pt-header md:px-4 md:py-28">
       <div className="mx-auto max-w-3xl">
         <PurchaseList purchases={purchases} title="Purchase History" />
       </div>

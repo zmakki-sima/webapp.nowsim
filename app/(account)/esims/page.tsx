@@ -17,7 +17,7 @@ export default async function EsimsPage() {
   if (!esims) redirect("/");
 
   return (
-    <section className="px-3 pb-20 pt-28 md:px-4 md:py-28">
+    <section className="px-3 pb-20 pt-header md:px-4 md:py-28">
       <div className="mx-auto max-w-3xl">
         <EsimList esims={esims.filter(isReusableEsim)} title="My eSIM’s" />
       </div>

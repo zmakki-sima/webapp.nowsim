@@ -14,7 +14,7 @@ export default async function CompatibleDevicesPage() {
   const groups = await getDeviceGroups();
 
   return (
-    <section className="px-3 pb-20 pt-28 md:px-4 md:py-28">
+    <section className="px-3 pb-20 pt-header md:px-4 md:py-28">
       <div className="mx-auto max-w-7xl">
         <Breadcrumb
           className="mb-10"

@@ -55,10 +55,10 @@ export default async function DestinationPage({ params }: PageProps) {
 
   return (
     <>
-      <section className="px-3 pt-28 md:px-4">
+      <section className="px-3 pt-header md:px-4">
         <div className="mx-auto max-w-7xl">
           <div className="grid gap-12 lg:grid-cols-[minmax(0,2fr)_minmax(0,3fr)] lg:items-start lg:gap-16">
-            <div className="lg:sticky lg:top-28">
+            <div className="lg:sticky lg:top-header">
               <Breadcrumb
                 className="mb-10"
                 items={[

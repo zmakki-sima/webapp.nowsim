@@ -23,7 +23,7 @@ export default async function HelpPage() {
 
   return (
     <>
-      <section className="px-6 pb-16 pt-28 md:px-12 md:pb-24">
+      <section className="px-6 pb-16 pt-header md:px-12 md:pb-24">
         <div className="mx-auto max-w-7xl">
           <Breadcrumb
             className="mb-10"

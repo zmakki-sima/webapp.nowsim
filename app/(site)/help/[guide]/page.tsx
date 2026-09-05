@@ -46,7 +46,7 @@ export default async function InstallGuidePage({ params }: PageProps) {
   const guide = getInstallGuide(platform);
 
   return (
-    <section className="px-3 pb-20 pt-28 md:px-4 md:py-28">
+    <section className="px-3 pb-20 pt-header md:px-4 md:py-28">
       <div className="mx-auto max-w-3xl">
         <Breadcrumb
           className="mb-8"

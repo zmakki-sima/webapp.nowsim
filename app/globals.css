@@ -77,7 +77,35 @@
   --duration-hover: 300ms;
 
   --header-height: 4.5rem;
+
+  /*
+   * Clearance for the first thing under the fixed header. Every full-page
+   * section starts here, so the header height and the notch inset are read
+   * from one place rather than re-typed as a magic `pt-28` on each page.
+   */
+  --header-clearance: calc(
+    var(--header-height) + env(safe-area-inset-top) + 2.5rem
+  );
 }
+
+/*
+ * Page sections that begin directly under the fixed header.
+ */
+@utility pt-header {
+  padding-top: var(--header-clearance);
+}
+
+@utility top-header {
+  top: var(--header-clearance);
+}
+
+/*
+ * Scroll-stacking cards need both axes: wide enough for the two-column card
+ * layout, and tall enough that a stuck card still fits under the header. A
+ * phone held sideways passes the width test and fails the height one badly —
+ * 390px of viewport against a 500px card — so width alone is the wrong gate.
+ */
+@custom-variant stack (@media (width >= 48rem) and (height >= 45rem));
 
 /*
  * Hover and press feedback for Pressable. Colours ease over --duration-hover,
