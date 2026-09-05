@@ -25,7 +25,7 @@ export function ActivationNote() {
 
   return (
     <div className="mt-8 flex items-center gap-4 rounded-card bg-surface-soft px-5 py-5">
-      <MdInfoOutline aria-hidden className="h-5 w-5 shrink-0 text-ink/40" />
+      <MdInfoOutline aria-hidden className="h-5 w-5 shrink-0 text-brand" />
 
       <div className="text-sm text-muted">
         <p className="font-bold text-ink">Can I activate my plan later?</p>

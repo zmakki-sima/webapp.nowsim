@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { MdArrowForward } from "react-icons/md";
+import { MdLanguage } from "react-icons/md";
 
 import { NetworkDialog } from "@/components/sections/destinations/NetworkDialog";
 import { Pressable } from "@/components/ui/Pressable";
@@ -22,8 +22,8 @@ export function NetworkLink({ operators }: { operators: string[] }) {
           "hover:bg-brand/20 active:bg-brand/20",
         )}
       >
+        <MdLanguage aria-hidden className="h-4 w-4 shrink-0" />
         View all {operators.length} networks
-        <MdArrowForward aria-hidden className="h-4 w-4 shrink-0" />
       </Pressable>
 
       <NetworkDialog

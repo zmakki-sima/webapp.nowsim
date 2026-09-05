@@ -39,10 +39,13 @@ const tones = {
     ),
     iconSide: { left: "left-4", right: "right-4" },
     input: cn(
-      "rounded-control bg-brand/6 py-3.5",
+      // A step below the brand/6 the rows beneath it carry, not a neutral: at
+      // the same tint the field read as one more row of the list, and a grey
+      // one was the only neutral surface in an otherwise brand-tinted panel.
+      "rounded-control bg-brand/4 py-3.5",
       "text-base text-ink placeholder:text-ink/40",
       "outline-none transition-colors duration-300 ease-hover",
-      "hover:bg-brand/10 focus:bg-brand/10",
+      "hover:bg-brand/8 focus:bg-brand/8",
       "focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand",
     ),
     padIcon: { left: "pl-11", right: "pr-11" },
