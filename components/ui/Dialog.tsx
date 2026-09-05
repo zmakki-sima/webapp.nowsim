@@ -135,7 +135,10 @@ export function Dialog({
         <div
           className={cn(
             "relative flex max-h-[85dvh] flex-col rounded-sheet",
-            "bg-surface p-7 text-ink md:p-8",
+            // 28px of padding each side costs a fifth of a 320px screen, which
+            // the QR code and the device list need back. Full padding returns
+            // as soon as there is width to spend on it.
+            "bg-surface p-5 text-ink sm:p-7 md:p-8",
             "border border-hairline shadow-2xl shadow-ink/20",
           )}
         >

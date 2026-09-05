@@ -185,8 +185,13 @@ export async function Footer() {
                       <li key={link.label}>
                         <Pressable
                           href={link.href}
+                          /* `hit` rather than more padding: the rows are 36px
+                             tall, short of the 44px touch minimum, and the
+                             invisible expander fixes the target without
+                             spacing the list out on desktop. */
+                          hit
                           className={cn(
-                            "-mx-1 px-1 py-1.5",
+                            "-mx-1 justify-start px-1 py-1.5",
                             "text-base font-medium text-muted-invert hover:text-white",
                           )}
                         >

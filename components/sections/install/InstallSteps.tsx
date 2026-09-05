@@ -17,8 +17,16 @@ import { installShotName, SHOT_HEIGHT, SHOT_WIDTH } from "@/lib/install";
 
 const frame = "w-60 shrink-0 snap-start sm:w-72";
 
+/*
+ * `max-md:hidden` rather than a bare `hidden`: `cn` concatenates, it does not
+ * resolve conflicts, so a plain `hidden` sat in the same layer as the
+ * `inline-flex` every Pressable carries and lost to it — these mouse-only
+ * arrows were showing up on phones, on top of the screenshots. A variant puts
+ * the rule in a media query, which outranks the base utility.
+ */
 const arrow = cn(
-  "absolute top-1/2 z-10 hidden h-10 w-10 -translate-y-1/2 rounded-full",
+  "absolute top-1/2 z-10 h-10 w-10 -translate-y-1/2 rounded-full",
+  "max-md:hidden",
   "border border-hairline bg-surface text-ink shadow-sm",
   "hover:bg-surface-soft md:flex",
 );
@@ -65,7 +73,10 @@ function Shots({
         className={cn(
           "-mx-6 flex snap-x snap-mandatory justify-center-safe gap-3",
           "overflow-x-auto px-6",
-          "scroll-smooth scroll-subtle md:-mx-8 md:px-8",
+          // `scroll-subtle` is the white-on-dark thumb; this rail sits on a
+          // near-white card, where it was invisible — and on a phone the
+          // scrollbar is the only thing saying the row goes on.
+          "scroll-smooth scroll-slim md:-mx-8 md:px-8",
         )}
       >
         {Array.from({ length: count }, (_, index) => {

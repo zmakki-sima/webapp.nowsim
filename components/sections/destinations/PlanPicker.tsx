@@ -91,14 +91,18 @@ export function PlanPicker({
 
   return (
     <>
+      {/*
+       * Side by side once there is room, stacked below `sm`: sharing the row on
+       * a phone squeezed the heading into a one-word-per-line column.
+       */}
       <div
         className={cn(
-          "mt-12 flex flex-wrap items-center gap-x-6 gap-y-4",
-          tabbed && "justify-between",
+          "mt-12 flex flex-col gap-4 sm:flex-row sm:flex-wrap sm:items-center sm:gap-x-6",
+          tabbed && "sm:justify-between",
         )}
       >
         {/* A 15rem floor left no room for the tabs beside it on a phone. */}
-        <h2 className="min-w-0 flex-1 text-xl font-bold tracking-[-0.02em] sm:min-w-[15rem]">
+        <h2 className="min-w-0 text-center text-xl font-bold tracking-[-0.02em] sm:min-w-[15rem] sm:flex-1 sm:text-left">
           {heading}
         </h2>
 
@@ -110,7 +114,8 @@ export function PlanPicker({
             label={`Plan type for ${destinationName}`}
             tabId={(id) => `${groupId}-tab-${id}`}
             panelId={`${groupId}-panel`}
-            className="shrink-0"
+            // `w-fit` + auto margins centres the pill under the stacked heading.
+            className="mx-auto shrink-0 sm:mx-0"
           />
         )}
       </div>

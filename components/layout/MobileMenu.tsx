@@ -92,6 +92,11 @@ export function MenuPanel({
         <div
           className={cn(
             "rounded-sheet p-2 text-ink",
+            // In landscape the panel starts 72px down a 390px-tall viewport,
+            // so the list has to be allowed to scroll rather than run off the
+            // bottom of the screen.
+            "max-h-[calc(100dvh-var(--header-height)-env(safe-area-inset-top)-1.5rem)]",
+            "overflow-y-auto overscroll-contain scroll-slim",
             "border border-white/60 bg-white/85 backdrop-blur-xl backdrop-saturate-150",
             "shadow-lg shadow-ink/10",
           )}

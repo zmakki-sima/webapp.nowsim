@@ -60,12 +60,12 @@ const steps: Step[] = [
   },
 ];
 
+/*
+ * How far each card is pushed down the stack, in rem. Fed to the class list as
+ * a custom property so the offset can be applied from `md` up only — see the
+ * card classes below.
+ */
 const stackStep = 6;
-
-const stackOffset = (index: number) => ({
-  transform: `translateY(${index * stackStep}rem)`,
-  marginTop: index === 0 ? undefined : `-${stackStep}rem`,
-});
 
 export function HowItWorks() {
   return (
@@ -98,11 +98,27 @@ export function HowItWorks() {
           {steps.map((step, index) => (
             <li
               key={step.title}
+              /*
+               * The stack only works while a card is shorter than the room
+               * left under the header. On a phone the cards run 700-790px
+               * against 450-550px of space, and in landscape it is worse, so
+               * every card's lower half — the phone mockup the step is about —
+               * sat below the fold and, being stuck, could never be scrolled
+               * to. Below `md` they are a plain vertical list; the stacking
+               * starts where there is height to spend on it.
+               */
               className={cn(
-                "sticky mb-4 md:mb-5",
-                "top-[calc(env(safe-area-inset-top)+var(--header-height)+3rem)]",
+                "mb-4 md:mb-5",
+                "stack:sticky stack:top-[calc(var(--header-clearance)+0.5rem)]",
+                "stack:translate-y-[calc(var(--stack-index)*var(--stack-step))]",
+                index > 0 && "stack:-mt-(--stack-step)",
               )}
-              style={stackOffset(index)}
+              style={
+                {
+                  "--stack-index": index,
+                  "--stack-step": `${stackStep}rem`,
+                } as React.CSSProperties
+              }
             >
               <article
                 className={cn(
@@ -168,7 +184,9 @@ export function HowItWorks() {
             </li>
           ))}
 
-          <li aria-hidden className="h-[45vh] min-h-56" />
+          {/* Scroll room for the last card to park in. Only the stacked
+              layout needs it; anywhere else it is dead space. */}
+          <li aria-hidden className="hidden h-[45vh] min-h-56 stack:block" />
         </ol>
       </div>
     </section>

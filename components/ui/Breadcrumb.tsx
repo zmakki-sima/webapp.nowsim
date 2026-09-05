@@ -18,14 +18,17 @@ export function Breadcrumb({
   return (
     <nav aria-label="Breadcrumb" className={className}>
       {/*
-        The crumbs carry their own `px-4` for a comfortable tap target, which
+        The crumbs carry their own `px-3` for a comfortable tap target, which
         has to be cancelled at the start of the row so the text lines up with
-        the page grid. A negative margin did that but made the box wider than
-        its container — tipping narrow screens into horizontal scroll — and
-        also pulled every *wrapped* line out of alignment. Removing the leading
-        padding from the first item does the same job with neither side effect.
+        the page grid. Dropping the leading padding from the first crumb did
+        that, but its hover pill then had no room on the left and the label sat
+        flush against the rounded edge. Shifting the whole row by one padding
+        step instead keeps every line — wrapped ones included — on the grid
+        with the padding intact. The step matches the narrowest page gutter, so
+        the pill never reaches past the viewport, and the widened `w-` cancels
+        the overhang so nothing can scroll sideways.
       */}
-      <ol className="flex w-full flex-wrap items-center text-sm font-medium md:text-base [&>li:first-child>*]:pl-0">
+      <ol className="-ml-3 flex w-[calc(100%_+_0.75rem)] flex-wrap items-center text-sm font-medium md:text-base">
         {items.map((item, index) => {
           const last = index === items.length - 1;
 
@@ -41,7 +44,7 @@ export function Breadcrumb({
               {last || !item.href ? (
                 <span
                   aria-current={last ? "page" : undefined}
-                  className="px-4 py-2 text-ink"
+                  className="px-3 py-2 text-ink"
                 >
                   {item.label}
                 </span>
@@ -50,7 +53,7 @@ export function Breadcrumb({
                   href={item.href}
                   hit
                   className={cn(
-                    "rounded-full px-4 py-2 text-muted",
+                    "rounded-full px-3 py-2 text-muted",
                     "hover:bg-surface-soft hover:text-ink",
                     "active:bg-surface-soft active:text-ink",
                   )}

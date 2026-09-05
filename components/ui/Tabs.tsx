@@ -1,6 +1,13 @@
 "use client";
 
-import { useRef, type KeyboardEvent, type ReactNode } from "react";
+import {
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+  type KeyboardEvent,
+  type ReactNode,
+} from "react";
 
 import { Pressable } from "@/components/ui/Pressable";
 import { cn } from "@/lib/cn";
@@ -17,10 +24,26 @@ import { cn } from "@/lib/cn";
  * room, so the pill border still wraps the tabs on desktop.
  */
 const list = cn(
-  "flex w-fit max-w-full items-center gap-1 rounded-full p-1",
+  "relative flex w-fit max-w-full items-center gap-1 rounded-full p-1",
   "overflow-x-auto overscroll-x-contain scroll-none",
   "border border-hairline bg-surface",
 );
+
+/*
+ * The scrollbar is hidden, so an overflowing strip looked like a row that
+ * simply ran out of tabs — on a 320px phone "Global" was sliced in half with
+ * nothing to say the rest could be reached. Fading whichever edge still has
+ * tabs behind it restores the cue. Driven from scroll position rather than a
+ * `mask-image` on a timeline, which Safari does not yet animate.
+ */
+const edgeFade =
+  "[mask-image:linear-gradient(to_right,transparent,#000_1.25rem,#000_calc(100%-1.25rem),transparent)]";
+
+const fadeStart =
+  "[mask-image:linear-gradient(to_right,transparent,#000_1.25rem)]";
+
+const fadeEnd =
+  "[mask-image:linear-gradient(to_right,#000_calc(100%-1.25rem),transparent)]";
 
 const tab = cn(
   "shrink-0 gap-2 rounded-full px-5 py-2.5 text-base font-semibold",
@@ -61,6 +84,49 @@ export function Tabs<Id extends string>({
 }) {
   const tabRefs = useRef<Partial<Record<Id, HTMLButtonElement | null>>>({});
 
+  const listRef = useRef<HTMLDivElement>(null);
+  const [edges, setEdges] = useState({ start: false, end: false });
+
+  const measure = useCallback(() => {
+    const node = listRef.current;
+    if (!node) return;
+
+    const max = node.scrollWidth - node.clientWidth;
+
+    setEdges({
+      start: node.scrollLeft > 1,
+      // A sub-pixel remainder is normal at the far end; 1px of slack keeps the
+      // fade from hanging around once the strip is scrolled out.
+      end: max > 1 && node.scrollLeft < max - 1,
+    });
+  }, []);
+
+  // A selected tab that starts out beyond the fold — "Global" arrived at from
+  // `?kind=global` — should be the one on screen, not the one off it.
+  useEffect(() => {
+    tabRefs.current[value]?.scrollIntoView({
+      block: "nearest",
+      inline: "nearest",
+    });
+  }, [value]);
+
+  useEffect(() => {
+    const node = listRef.current;
+    if (!node) return;
+
+    measure();
+
+    const observer = new ResizeObserver(measure);
+    observer.observe(node);
+
+    node.addEventListener("scroll", measure, { passive: true });
+
+    return () => {
+      observer.disconnect();
+      node.removeEventListener("scroll", measure);
+    };
+  }, [measure, items]);
+
   const controls = (id: Id) =>
     typeof panelId === "string" ? panelId : panelId(id);
 
@@ -88,10 +154,18 @@ export function Tabs<Id extends string>({
 
   return (
     <div
+      ref={listRef}
       role="tablist"
       aria-label={label}
       onKeyDown={onKeyDown}
-      className={cn(list, fill && "w-full", className)}
+      className={cn(
+        list,
+        fill && "w-full",
+        edges.start && edges.end && edgeFade,
+        edges.start && !edges.end && fadeStart,
+        !edges.start && edges.end && fadeEnd,
+        className,
+      )}
     >
       {items.map((item) => {
         const selected = item.id === value;

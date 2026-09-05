@@ -98,7 +98,9 @@ export function InstallDialog({
                 width={200}
                 height={200}
                 unoptimized
-                className="h-[12.5rem] w-[12.5rem]"
+                /* A flat 200px left no slack at all inside a 320px screen's
+                   dialog. It scales down there and holds its old size up. */
+                className="h-auto w-[12.5rem] max-w-full"
               />
             </div>
 
