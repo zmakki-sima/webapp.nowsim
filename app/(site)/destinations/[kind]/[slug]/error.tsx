@@ -19,8 +19,7 @@ export default function DestinationError({
 
   return (
     <RouteMessage
-      className="pt-40 md:pt-48"
-      eyebrow="Something broke"
+      className="pt-header"
       title="We couldn't load this destination"
       body="The plans for this destination didn't come back this time. Try again, or pick another destination."
     >

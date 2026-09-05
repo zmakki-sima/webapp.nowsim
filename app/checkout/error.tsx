@@ -4,6 +4,7 @@ import {
   RouteMessage,
   routeMessageAction,
   routeMessageActionQuiet,
+  routeMessageBleedHeader,
 } from "@/components/common/RouteMessage";
 import { useReportError } from "@/components/common/useReportError";
 import { Pressable } from "@/components/ui/Pressable";
@@ -19,7 +20,7 @@ export default function CheckoutError({
 
   return (
     <RouteMessage
-      eyebrow="Something broke"
+      className={routeMessageBleedHeader}
       title="We couldn't load your order"
       body="Nothing has been charged. Try again, or go back and pick your plan once more."
     >

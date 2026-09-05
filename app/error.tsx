@@ -3,7 +3,6 @@
 import {
   RouteMessage,
   routeMessageAction,
-  routeMessageActionQuiet,
 } from "@/components/common/RouteMessage";
 import { useReportError } from "@/components/common/useReportError";
 import { Pressable } from "@/components/ui/Pressable";
@@ -30,18 +29,13 @@ export default function RootError({
   useReportError(error, "root");
 
   return (
-    <main className="flex-1">
+    <main className="flex flex-1 flex-col">
       <RouteMessage
-        eyebrow="Something broke"
         title="We lost the signal"
         body="An unexpected error stopped this page from loading. Head back home and try from there."
       >
         <Pressable href="/" className={routeMessageAction}>
           Back to home
-        </Pressable>
-
-        <Pressable href="/destinations" className={routeMessageActionQuiet}>
-          All destinations
         </Pressable>
       </RouteMessage>
     </main>

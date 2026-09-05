@@ -19,8 +19,7 @@ export default function DestinationsError({
 
   return (
     <RouteMessage
-      className="pt-40 md:pt-48"
-      eyebrow="Something broke"
+      className="pt-header"
       title="We couldn't load the destinations"
       body="The catalog didn't come back this time. Try again. Your plans are still there."
     >

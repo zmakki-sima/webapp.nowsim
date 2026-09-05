@@ -9,7 +9,9 @@ export default function CheckoutLayout({
     <>
       <CheckoutHeader />
 
-      <main className="flex-1 pt-[calc(var(--header-height)+env(safe-area-inset-top))]">
+      {/* A column, so a page that wants the leftover height — the error and
+          not-found messages — can claim it with `flex-1`. */}
+      <main className="flex flex-1 flex-col pt-[calc(var(--header-height)+env(safe-area-inset-top))]">
         {children}
       </main>
     </>

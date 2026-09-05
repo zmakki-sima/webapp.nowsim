@@ -13,9 +13,8 @@ export const metadata: Metadata = {
 
 export default function NotFound() {
   return (
-    <main className="flex-1">
+    <main className="flex flex-1 flex-col">
       <RouteMessage
-        eyebrow="404"
         title="This page went off-grid"
         body="The page you asked for doesn't exist. Check the address, or start from a destination."
       >

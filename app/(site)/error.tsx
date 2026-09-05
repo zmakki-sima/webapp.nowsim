@@ -19,8 +19,7 @@ export default function SiteError({
 
   return (
     <RouteMessage
-      className="pt-40 md:pt-48"
-      eyebrow="Something broke"
+      className="pt-header"
       title="We lost the signal"
       body="An unexpected error stopped this page from loading. Try again. If it keeps happening, come back in a moment."
     >

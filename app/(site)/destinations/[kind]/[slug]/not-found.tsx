@@ -14,8 +14,7 @@ export const metadata: Metadata = {
 export default function DestinationNotFound() {
   return (
     <RouteMessage
-      className="pt-40 md:pt-48"
-      eyebrow="404"
+      className="pt-header"
       title="We don't cover that one yet"
       body="This destination isn't in the catalog. Browse everywhere we do cover. There are over 200 to choose from."
     >

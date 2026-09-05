@@ -19,8 +19,7 @@ export default function CompatibleDevicesError({
 
   return (
     <RouteMessage
-      className="pt-40 md:pt-48"
-      eyebrow="Something broke"
+      className="pt-header"
       title="We couldn't load the device list"
       body="The list didn't come back this time. Try again. Most phones made since 2018 support eSIM."
     >

@@ -4,6 +4,7 @@ import {
   RouteMessage,
   routeMessageAction,
   routeMessageActionQuiet,
+  routeMessageBleedHeader,
 } from "@/components/common/RouteMessage";
 import { Pressable } from "@/components/ui/Pressable";
 
@@ -15,9 +16,9 @@ export const metadata: Metadata = {
 export default function CheckoutNotFound() {
   return (
     <RouteMessage
-      eyebrow="404"
+      className={routeMessageBleedHeader}
       title="We couldn't find that order"
-      body="The plan or destination in this link no longer exists. Pick a plan again and we'll take you straight back to checkout."
+      body="The plan, destination or quantity in this link isn't one we can sell. Pick a plan again and we'll take you straight back to checkout."
     >
       <Pressable href="/destinations" className={routeMessageAction}>
         All destinations

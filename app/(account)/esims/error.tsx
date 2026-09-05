@@ -19,8 +19,7 @@ export default function EsimsError({
 
   return (
     <RouteMessage
-      className="pt-40 md:pt-48"
-      eyebrow="Something broke"
+      className="pt-header"
       title="We couldn't load your eSIMs"
       body="Your eSIMs and their data are safe. This page just failed to fetch them. Try again."
     >

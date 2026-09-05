@@ -19,8 +19,7 @@ export default function PurchasesError({
 
   return (
     <RouteMessage
-      className="pt-40 md:pt-48"
-      eyebrow="Something broke"
+      className="pt-header"
       title="We couldn't load your purchases"
       body="Your orders and receipts are safe. This page just failed to fetch them. Try again."
     >
