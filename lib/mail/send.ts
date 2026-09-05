@@ -25,6 +25,23 @@ export function escapeHtml(value: string): string {
 }
 
 /**
+ * The grey second line under the subject in an inbox row or a phone
+ * notification. Without one, a client scrapes the top of the mail instead and
+ * the preview reads as a run-on of the logo alt text, the heading and the
+ * first paragraph. Hidden in every client that renders the mail, so the
+ * visible email is unchanged — this only writes the preview line.
+ *
+ * The trailing padding is what stops the client scraping body text to fill the
+ * rest of the line: zero-width joiners and soft hyphens draw nothing but still
+ * count as characters.
+ */
+export function preheader(text: string): string {
+  const pad = "&#847;&zwnj;&nbsp;&#8199;&shy;".repeat(30);
+
+  return `<div style="display:none;max-height:0;max-width:0;opacity:0;overflow:hidden;mso-hide:all;font-size:1px;line-height:1px;color:#ffffff">${escapeHtml(text)}${pad}</div>`;
+}
+
+/**
  * `contentId` turns the file into an inline part the HTML can reference with
  * `src="cid:<contentId>"`. Without it the file only rides along as a download.
  */

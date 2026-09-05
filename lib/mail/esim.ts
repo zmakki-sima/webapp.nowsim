@@ -3,7 +3,13 @@ import "server-only";
 import { env } from "@/lib/env";
 import { installHref } from "@/lib/install";
 import { LOGO_CID, logoAttachment } from "@/lib/mail/logo";
-import { deliver, escapeHtml, FONT, type Attachment } from "@/lib/mail/send";
+import {
+  deliver,
+  escapeHtml,
+  FONT,
+  preheader,
+  type Attachment,
+} from "@/lib/mail/send";
 import { isDeployed } from "@/lib/stage";
 import type { Esim } from "@/lib/types";
 
@@ -354,7 +360,6 @@ function body(esim: Esim, email: string, hasQr: boolean) {
     "Keep this email to yourself. Anyone holding the activation code can install this eSIM, and it only installs once.",
     `Stuck at any step? Read ${SITE}/help or write to support@nowsim.com from this address. We answer fast.`,
     "Safe travels, the nowsim team",
-    "Please do not reply to this email.",
     `Sent to ${email}`,
     `Copyright © ${year} nowsim. All rights reserved.`,
   ]
@@ -364,6 +369,7 @@ function body(esim: Esim, email: string, hasQr: boolean) {
   const html = `<!doctype html>
 <html lang="en">
   <body style="margin:0;padding:0;background:${PAGE}">
+    ${preheader("Install your eSIM and switch it on in a few steps")}
     <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background:${PAGE}">
       <tr>
         <td align="center" style="padding:32px 12px">
@@ -701,12 +707,6 @@ function body(esim: Esim, email: string, hasQr: boolean) {
                   </tr>
 
                   <tr>
-                    <td style="${FONT};font-size:12px;line-height:1.7;color:${FAINT};padding-bottom:6px" align="center">
-                      Please do not reply to this email.
-                    </td>
-                  </tr>
-
-                  <tr>
                     <td style="${FONT};font-size:12px;line-height:1.7;color:${FAINT};padding-bottom:12px" align="center">
                       Sent to <span style="color:${BRAND};font-weight:700">${escapeHtml(email)}</span>
                     </td>
@@ -767,7 +767,6 @@ function topUpBody(esim: Esim, email: string) {
     `You can see this plan any time at ${SITE}/esims.`,
     `Stuck at any step? Read ${SITE}/help or write to support@nowsim.com from this address. We answer fast.`,
     "Safe travels, the nowsim team",
-    "Please do not reply to this email.",
     `Sent to ${email}`,
     `Copyright © ${year} nowsim. All rights reserved.`,
   ]
@@ -777,6 +776,7 @@ function topUpBody(esim: Esim, email: string) {
   const html = `<!doctype html>
 <html lang="en">
   <body style="margin:0;padding:0;background:${PAGE}">
+    ${preheader("Nothing to install - your new plan is ready to use")}
     <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background:${PAGE}">
       <tr>
         <td align="center" style="padding:32px 12px">
@@ -860,12 +860,6 @@ function topUpBody(esim: Esim, email: string) {
                       <a href="${SITE}" style="${FONT};color:${MUTED};text-decoration:none">Website</a> &nbsp;·&nbsp;
                       <a href="${SITE}/help" style="${FONT};color:${MUTED};text-decoration:none">Help centre</a> &nbsp;·&nbsp;
                       <a href="${SITE}/esims" style="${FONT};color:${MUTED};text-decoration:none">My eSIMs</a>
-                    </td>
-                  </tr>
-
-                  <tr>
-                    <td style="${FONT};font-size:12px;line-height:1.7;color:${FAINT};padding-bottom:6px" align="center">
-                      Please do not reply to this email.
                     </td>
                   </tr>
 

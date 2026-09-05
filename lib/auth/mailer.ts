@@ -1,8 +1,12 @@
 import "server-only";
 
+import { env } from "@/lib/env";
 import { LOGO_CID, logoAttachment } from "@/lib/mail/logo";
-import { deliver, escapeHtml, FONT } from "@/lib/mail/send";
+import { deliver, escapeHtml, FONT, preheader } from "@/lib/mail/send";
 import { isDeployed } from "@/lib/stage";
+
+/** Mail runs outside a request, so absolute links come from the environment. */
+const SITE = env.NEXT_PUBLIC_SITE_URL;
 
 const BRAND = "#5f47eb";
 const BRAND_TINT = "#efecfd";
@@ -13,21 +17,24 @@ const HAIRLINE = "#e6e2f7";
 const PAGE = "#f1eefc";
 const FOOTER = "#f7f5fe";
 
+const PREVIEW = "Enter this code to verify your email";
+
 function body(email: string, code: string, minutes: number) {
   const year = new Date().getUTCFullYear();
 
   const text = [
-    "Verify your email address",
+    PREVIEW,
     `Your nowsim confirmation code is: ${code}`,
     `Use this temporary code to finish signing in. It expires in ${minutes} minutes and can be used once.`,
     "If you received this email in error, you can safely ignore it. Nobody can sign in without the code.",
-    `Account email: ${email}`,
+    `Sent to ${email}`,
     `Copyright © ${year} nowsim. All rights reserved.`,
   ].join("\n\n");
 
   const html = `<!doctype html>
 <html lang="en">
   <body style="margin:0;padding:0;background:${PAGE}">
+    ${preheader(PREVIEW)}
     <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background:${PAGE}">
       <tr>
         <td align="center" style="padding:32px 12px">
@@ -83,13 +90,6 @@ function body(email: string, code: string, minutes: number) {
             </tr>
 
             <tr>
-              <td style="${FONT};padding:18px 40px 0;font-size:13px;line-height:1.6;color:${MUTED}">
-                Account email:
-                <span style="color:${BRAND};font-weight:700">${escapeHtml(email)}</span>
-              </td>
-            </tr>
-
-            <tr>
               <td style="padding:36px 0 0">
                 <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
                   <tr>
@@ -100,8 +100,28 @@ function body(email: string, code: string, minutes: number) {
             </tr>
 
             <tr>
-              <td align="center" style="${FONT};background:${FOOTER};padding:26px 40px;font-size:12px;line-height:1.6;color:${FAINT}">
-                Copyright © ${year} nowsim. All rights reserved.
+              <td style="background:${FOOTER};padding:26px 40px">
+                <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%">
+                  <tr>
+                    <td style="${FONT};font-size:13px;line-height:1.8;color:${MUTED};padding-bottom:14px" align="center">
+                      <a href="${SITE}" style="${FONT};color:${MUTED};text-decoration:none">Website</a> &nbsp;·&nbsp;
+                      <a href="${SITE}/help" style="${FONT};color:${MUTED};text-decoration:none">Help centre</a> &nbsp;·&nbsp;
+                      <a href="${SITE}/esims" style="${FONT};color:${MUTED};text-decoration:none">My eSIMs</a>
+                    </td>
+                  </tr>
+
+                  <tr>
+                    <td style="${FONT};font-size:12px;line-height:1.7;color:${FAINT};padding-bottom:12px" align="center">
+                      Sent to <span style="color:${BRAND};font-weight:700">${escapeHtml(email)}</span>
+                    </td>
+                  </tr>
+
+                  <tr>
+                    <td style="${FONT};font-size:12px;line-height:1.7;color:${FAINT}" align="center">
+                      Copyright © ${year} nowsim. All rights reserved.
+                    </td>
+                  </tr>
+                </table>
               </td>
             </tr>
           </table>
@@ -124,7 +144,7 @@ export async function sendOtpEmail(
 
   const sent = await deliver({
     to: email,
-    subject: `${code} is your nowsim confirmation code`,
+    subject: `Your confirmation code: ${code}`,
     text,
     html,
     attachments: [logoAttachment()],
