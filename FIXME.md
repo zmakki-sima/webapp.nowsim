@@ -1,88 +1,105 @@
 # FIXME — what's left
 
----
-
 ## To go live
+1. **Ask Yesim: can the API take the token in a header?** 🔴
+   Right now the token is put in the web address, so it gets written into logs
+   we don't own. [`yesim.ts:40`](lib/api/yesim.ts)
+   - Yes → two-line change.
+   - No → rotate the token before launch.
 
-In order. 1–4 are waiting on other people, so start them today.
+2. **Start Stripe account activation.** 🟡
+   Needs company details, bank account, tax info, ID check. Stripe's review
+   takes real calendar days. [`PAYMENT.md`](PAYMENT.md) §10
 
-1. **Ask Yesim if the API takes the token in a header.** Yes: a two-line change.
-   No: rotate the token before launch. The token currently travels in the URL, so
-   it lands in logs we don't control. [`yesim.ts:40`](lib/api/yesim.ts) 🔴
-2. **Start Stripe account activation.** Legal entity, bank account, tax details,
-   ID verification. Their review takes calendar time. [`PAYMENT.md`](PAYMENT.md)
-   §10 🟡
-3. **Get the legal pages finished.** Terms end with "This page is still being
-   published" and have no Effective Date; two links inside them
-   (`nowsim.com/cof/`, `nowsim.com/acceptable-use-policy/`) go nowhere. Stripe
-   requires real legal pages to activate.
-   [`terms-of-service/page.tsx:52,67,755`](app/(site)/terms-of-service/page.tsx) 🟡
-4. **Get real numbers from marketing, or remove them.** Three different unsourced
-   review scores: 4.8 ([`TrustBar.tsx:20`](components/common/TrustBar.tsx)), 4.9
-   ([`About.tsx:64`](components/sections/main/About.tsx)), 4.7 with 97,400+
-   reviews ([`PlanPicker.tsx:261`](components/sections/destinations/PlanPicker.tsx)).
-   Plus "1,657,382,391 Gigabytes delivered"
-   ([`About.tsx:74`](components/sections/main/About.tsx)) 🟡
-5. **Decide currency settlement.** The Stripe account is CHF, prices are EUR.
-   Stripe converts at their rate and takes a fee, so payouts won't match the
-   sticker price. [`PAYMENT.md`](PAYMENT.md) §13.1
-6. **Confirm the Stripe account is the right one.** Connect is enabled and the
-   account is named "Swan sandbox" — Connect means money routes to *other*
-   accounts. [`PAYMENT.md`](PAYMENT.md) §13.2
-7. **Run the sandbox test matrix** — 14 scenarios, none run yet. This is also the
-   only thing that proves the paid-but-undelivered alert actually fires.
+3. **Finish the legal pages.** 🟡
+   Stripe won't activate without them.
+   [`terms-of-service/page.tsx`](app/\(site\)/terms-of-service/page.tsx)
+   - Line 755 still says "This page is still being published".
+   - No Effective Date at the end.
+   - Two dead links: `nowsim.com/cof/` (line 52) and
+     `nowsim.com/acceptable-use-policy/` (line 67).
+
+4. **Get real review numbers from marketing, or delete them.** 🟡
+   Four made-up figures, three of them contradicting each other:
+   - 4.8 — [`TrustBar.tsx:20`](components/common/TrustBar.tsx)
+   - 4.9 — [`About.tsx:71`](components/sections/main/About.tsx)
+   - 4.7 (97,400+ reviews) — [`PlanPicker.tsx:262`](components/sections/destinations/PlanPicker.tsx)
+   - "1,657,382,391 Gigabytes delivered" — [`About.tsx:87`](components/sections/main/About.tsx)
+
+
+### Money decisions
+5. **Pick a settlement currency.** The Stripe account is CHF, the prices are
+   EUR. Stripe converts at its own rate and charges a fee, so what lands in the
+   bank won't match the price on the page. [`PAYMENT.md`](PAYMENT.md) §13
+
+6. **Check we're using the right Stripe account.** Connect is switched on and
+   the account is called "Swan sandbox". Connect means money gets routed to
+   *other* accounts. [`PAYMENT.md`](PAYMENT.md) §13
+
+7. **Run the sandbox test matrix.** 14 scenarios, none run yet. It's also the
+   only proof that the "paid but not delivered" alert email actually fires.
    [`PAYMENT.md`](PAYMENT.md) §9
-8. **Fix or hide the delete-account button.** Live, red, no handler — a user who
-   clicks it will think their account was deleted.
-   [`AccountAction.tsx:259`](components/layout/AccountAction.tsx) *(waiting on
-   the deletion API)*
-9. **Add security headers** before taking real card traffic. No CSP, HSTS,
-   `X-Content-Type-Options`, `Referrer-Policy` or `Permissions-Policy`; no
-   `headers()` block and no `serverActions.allowedOrigins`.
-   [`next.config.ts`](next.config.ts)
-10. **Stop sending the customer's email as a URL parameter** to `new_user`. Same
-    logging problem as the Yesim token. [`user.ts:8`](lib/auth/user.ts)
-11. **Fix the FAQ's compatibility-check promise** — "We check compatibility at
-    checkout, so you'll know before you pay." No such check exists.
+
+
+### Code fixes
+8. **Fix or hide the "Delete account" button.** Still live, still red, still has
+   no click handler. Anyone who presses it will think their account is gone.
+   [`AccountAction.tsx:257`](components/layout/AccountAction.tsx)
+   *(blocked on the deletion API)*
+
+9. **Add security headers before taking real cards.** [`next.config.ts`](next.config.ts)
+   has no `headers()` block at all — so no CSP, HSTS, `X-Content-Type-Options`,
+   `Referrer-Policy` or `Permissions-Policy` — and no
+   `serverActions.allowedOrigins`.
+
+10. **Stop putting the customer's email in the web address** when calling
+    `new_user`. Same logging leak as the Yesim token.
+    [`user.ts:8`](lib/auth/user.ts)
+
+11. **Fix the FAQ's false promise.** It says "We check compatibility at
+    checkout, so you'll know before you pay." There is no such check.
     [`Faq.tsx:23`](components/common/Faq.tsx)
-12. **Confirm the dev-only logging guards hold.** A live OTP and email
-    ([`mailer.ts:140`](lib/auth/mailer.ts)) and an ICCID and email
-    ([`esim.ts:885,910`](lib/mail/esim.ts)) print behind a production guard.
-13. **Set `NOWSIM_STAGE=live` in production, redeploy, then open `/robots.txt`.**
-    It must say `Allow: /`. If it says `Disallow: /`, the site is invisible to
-    Google. Prerendered at build time, so a variable change alone won't do it.
-14. **Buy one eSIM yourself with a real card**, confirm it arrives, then refund
-    it. Never let a customer be the first live test.
+
+
+### Last steps on launch day
+12. **Set `NOWSIM_STAGE=live`, redeploy, then open `/robots.txt`.**
+    It must read `Allow: /`. If it reads `Disallow: /`, Google can't see the
+    site. The file is built at deploy time, so changing the variable alone does
+    nothing. [`robots.ts`](app/robots.ts)
+
+13. **Buy one eSIM yourself with a real card**, check it arrives, then refund
+    it. A customer should never be the first live test.
 
 ---
 
 ## Not blocking launch
+- **Country photos cover about 2 in 3 destinations.** 95 photos on disk for
+  ~148 countries; the rest show a generic placeholder. Adding a file is all it
+  takes — [`heroes.ts`](lib/heroes.ts) now scans the folder, so there's no list
+  to update.
 
-- **Country hero images cover only ~64%** (95 of ~148). The set runs a→`morocco`
-  then jumps to `united-states`; everything between falls back to a generic
-  image. [`heroes.ts:57`](lib/heroes.ts)
-- **All 9 error boundaries throw the error away**, so every client-side crash
-  vanishes with no way to report it. [`app/error.tsx`](app/error.tsx),
-  [`app/global-error.tsx`](app/global-error.tsx), plus 7 per-section ones.
-  [`app/error.tsx`](app/error.tsx) is also nearly unreachable and duplicates
-  [`app/(site)/error.tsx`](app/(site)/error.tsx) word for word.
-- **`/purchases` is missing from `PROTECTED`** ([`proxy.ts:12`](proxy.ts)). Not a
-  security hole — the data layer returns nothing without a session — but
-  signed-out users see an empty page instead of a redirect.
-- **Duplication.** Three near-identical search dialogs sharing layout, filter
-  logic and scroll container —
-  [`CoverageDialog.tsx`](components/sections/destinations/CoverageDialog.tsx),
-  [`NetworkDialog.tsx`](components/sections/destinations/NetworkDialog.tsx),
-  [`DeviceDialog.tsx`](components/sections/destinations/DeviceDialog.tsx);
-  device filtering duplicated between `DeviceDialog` and
-  `DeviceExplorer`; destination search built twice (`DestinationSearch`,
-  `NextTripFinder`); card style tokens copy-pasted between `EsimCard` and
-  `PurchaseCard`; `function Empty()` duplicated in `EsimList` and `PurchaseList`;
-  auth form constants copy-pasted between `EmailSignIn` and `ConfirmIdentity`.
-- **Docs / tooling.** [`README.md`](README.md) is still Next.js boilerplate;
-  `YESIM_API_BASE` undocumented in [`.env.example`](.env.example);
-  [`scripts/hero-names.mjs`](scripts/hero-names.mjs) is orphaned;
-  `next-env.d.ts` was hand-edited; no tests, no CI, no `.github/`, no Dockerfile,
-  no `vercel.json`. Decide whether [`PLAN.md`](PLAN.md) ships — it records 4
-  unresolved high-severity `npm audit` findings in `sharp`/libvips needing Next
-  16.3.0, and the project is pinned to 16.2.12.
+- **Repeated code.** Nothing broken, just more places to change later:
+  - Three near-identical search dialogs —
+    [`CoverageDialog`](components/sections/destinations/CoverageDialog.tsx),
+    [`NetworkDialog`](components/sections/destinations/NetworkDialog.tsx),
+    [`DeviceDialog`](components/sections/destinations/DeviceDialog.tsx).
+    They share `Dialog` and `SearchField`, but the layout and scroll container
+    are copied three times.
+  - Destination search built twice:
+    [`DestinationSearch`](components/sections/main/DestinationSearch.tsx) and
+    [`NextTripFinder`](components/sections/main/NextTripFinder.tsx). The
+    matching logic is shared; the UI is not.
+  - Card style tokens copy-pasted between
+    [`EsimCard`](components/sections/esims/EsimCard.tsx) and
+    [`PurchaseCard`](components/sections/purchases/PurchaseCard.tsx).
+  - `function Empty()` written twice, in
+    [`EsimList`](components/sections/esims/EsimList.tsx) and
+    [`PurchaseList`](components/sections/purchases/PurchaseList.tsx).
+  - `field` and `button` constants copied from
+    [`EmailSignIn`](components/auth/EmailSignIn.tsx) into
+    [`ConfirmIdentity`](components/sections/esims/ConfirmIdentity.tsx), which
+    already imports `lightTone` from it.
+
+- **Docs and tooling.**
+  - [`README.md`](README.md) is still the Next.js starter text.
+  - No tests, no CI, no `.github/`, no Dockerfile, no `vercel.json`.
