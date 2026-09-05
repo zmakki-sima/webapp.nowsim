@@ -3,6 +3,8 @@ import path from "node:path";
 
 const BASE = process.env.YESIM_API_BASE ?? "https://partners-api.yesim.biz";
 const TOKEN = process.env.YESIM_API_TOKEN;
+// Generated, never committed — .gitignore covers it. The lists are a snapshot
+// of the live catalog, so they go stale the moment Yesim adds a destination.
 const OUT = path.join(process.cwd(), "docs", "hero-names");
 
 const folders = {
@@ -13,7 +15,7 @@ const folders = {
 
 if (!TOKEN) {
   console.error("YESIM_API_TOKEN is not set.");
-  console.error("Run with: node --env-file=.env.local scripts/hero-names.mjs");
+  console.error("Run with: npm run hero-names");
   process.exit(1);
 }
 
