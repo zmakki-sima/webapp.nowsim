@@ -3,6 +3,7 @@
 import { verifyFreshSession } from "@/lib/auth/dal";
 import { digest, redis } from "@/lib/auth/redis";
 import { getEsims } from "@/lib/data/esims";
+import { ESIM_MAIL_COOLDOWN_SECONDS } from "@/lib/mail/cooldown";
 import { sendEsimEmail } from "@/lib/mail/esim";
 
 export type MailState = {
@@ -12,8 +13,6 @@ export type MailState = {
   locked?: boolean;
   throttled?: boolean;
 };
-
-const COOLDOWN_SECONDS = 60;
 
 export async function emailEsim(esimId: string): Promise<MailState> {
   const session = await verifyFreshSession();
@@ -39,7 +38,7 @@ export async function emailEsim(esimId: string): Promise<MailState> {
     const claimed = await redis().set(
       `mail:esim:${digest(`${session.email}:${esim.id}`)}`,
       1,
-      { nx: true, ex: COOLDOWN_SECONDS },
+      { nx: true, ex: ESIM_MAIL_COOLDOWN_SECONDS },
     );
 
     if (claimed !== "OK") {
