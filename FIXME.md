@@ -78,28 +78,6 @@
   takes — [`heroes.ts`](lib/heroes.ts) now scans the folder, so there's no list
   to update.
 
-- **Repeated code.** Nothing broken, just more places to change later:
-  - Three near-identical search dialogs —
-    [`CoverageDialog`](components/sections/destinations/CoverageDialog.tsx),
-    [`NetworkDialog`](components/sections/destinations/NetworkDialog.tsx),
-    [`DeviceDialog`](components/sections/destinations/DeviceDialog.tsx).
-    They share `Dialog` and `SearchField`, but the layout and scroll container
-    are copied three times.
-  - Destination search built twice:
-    [`DestinationSearch`](components/sections/main/DestinationSearch.tsx) and
-    [`NextTripFinder`](components/sections/main/NextTripFinder.tsx). The
-    matching logic is shared; the UI is not.
-  - Card style tokens copy-pasted between
-    [`EsimCard`](components/sections/esims/EsimCard.tsx) and
-    [`PurchaseCard`](components/sections/purchases/PurchaseCard.tsx).
-  - `function Empty()` written twice, in
-    [`EsimList`](components/sections/esims/EsimList.tsx) and
-    [`PurchaseList`](components/sections/purchases/PurchaseList.tsx).
-  - `field` and `button` constants copied from
-    [`EmailSignIn`](components/auth/EmailSignIn.tsx) into
-    [`ConfirmIdentity`](components/sections/esims/ConfirmIdentity.tsx), which
-    already imports `lightTone` from it.
-
 - **Docs and tooling.**
   - [`README.md`](README.md) is still the Next.js starter text.
   - No tests, no CI, no `.github/`, no Dockerfile, no `vercel.json`.
