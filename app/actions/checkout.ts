@@ -27,6 +27,13 @@ export type InstallTarget = {
   art?: string;
   state: EsimState;
   expiresAt?: string;
+  /**
+   * The plan about to be written over. Only its shape: what the card has left
+   * to spend is not offered as a reason to pick one, because picking it is what
+   * discards it.
+   */
+  data?: string;
+  days?: number;
 };
 
 /**
@@ -57,6 +64,8 @@ export async function listInstallTargets(): Promise<InstallTarget[] | null> {
         art: esim.plan?.art,
         state: esim.state,
         expiresAt: esim.expiresAt,
+        data: esim.plan?.data,
+        days: esim.plan?.days,
       }));
   } catch (cause) {
     console.error("listInstallTargets failed:", cause);
