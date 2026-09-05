@@ -1,49 +1,29 @@
 "use client";
 
 import Image from "next/image";
-import { useState } from "react";
-import {
-  MdAdd,
-  MdCheck,
-  MdMailOutline,
-  MdQrCode2,
-  MdSimCard,
-} from "react-icons/md";
+import { useEffect, useState } from "react";
+import { MdCheck, MdMailOutline, MdQrCode2, MdSimCard } from "react-icons/md";
 
 import { emailEsim, type MailState } from "@/app/actions/esims";
+import {
+  cardPill,
+  cardPillTone,
+  cardSpec,
+  Fact,
+} from "@/components/common/CardFact";
 import { InstallDialog } from "@/components/sections/esims/InstallDialog";
 import { Pressable } from "@/components/ui/Pressable";
 import { cn } from "@/lib/cn";
-import {
-  esimStateLabels,
-  isLiveEsim,
-  type Esim,
-  type EsimState,
-} from "@/lib/types";
+import { ESIM_MAIL_COOLDOWN_SECONDS } from "@/lib/mail/cooldown";
+import { esimStateLabels, isLiveEsim, type Esim } from "@/lib/types";
 import { formatData, formatDay } from "@/lib/units";
 
-const pill = cn(
-  "shrink-0 rounded-full px-3 py-1",
-  "text-[0.8125rem]/[1.125rem] font-bold",
-);
-
-const spec = cn(
-  "shrink-0 rounded-full px-2.5 py-0.5",
-  "text-[0.8125rem]/[1.125rem] font-medium text-brand",
-  /* Brand-tinted, not grey — greys go muddy on the lilac card. */
-  "bg-brand/10",
-);
-
-const pillTone: Record<EsimState, string> = {
-  installed: "bg-success/12 text-success",
-  issued: "bg-ink/8 text-muted",
-  ready: "bg-brand/15 text-brand",
-  expired: "bg-ink/8 text-muted",
-  removed: "bg-danger/15 text-danger",
-};
-
+/* Full width only on a narrow phone, where the pair cannot share a row and two
+   half-empty pills read as a broken column. Above that they size to their label
+   and wrap on their own when they run out of room. */
 const action = cn(
   "rounded-full border border-transparent px-5 py-2.5 text-sm font-bold",
+  "w-full min-[480px]:w-auto",
 );
 
 const primary = cn(
@@ -58,20 +38,17 @@ const secondary = cn(
   "hover:bg-brand/20 active:bg-brand/20",
 );
 
-const quiet = cn(action, "border-hairline bg-transparent text-muted");
+/* Both spent states stay solid chips. A disabled button left to fade out reads
+   as the control having vanished rather than as a confirmation in its place. */
+const pending = cn(secondary, "disabled:opacity-100");
 
-const factLabel = "text-[0.8125rem]/[1.125rem] text-muted";
-
-const factValue = "mt-0.5 text-base font-bold tracking-[-0.01em]";
-
-function Fact({ label, value }: { label: string; value: string }) {
-  return (
-    <div>
-      <dt className={factLabel}>{label}</dt>
-      <dd className={factValue}>{value}</dd>
-    </div>
-  );
-}
+const done = cn(
+  action,
+  /* Same brand family as the live button, dialled down — spent, not a
+     different meaning. */
+  "border-brand/20 bg-brand/8 text-brand/60",
+  "disabled:opacity-100",
+);
 
 export function EsimCard({ esim }: { esim: Esim }) {
   const [installing, setInstalling] = useState(false);
@@ -84,10 +61,24 @@ export function EsimCard({ esim }: { esim: Esim }) {
 
   const { plan, usage, state } = esim;
 
-  // Sticky for the life of the page. A mail that has left is not worth sending
-  // twice, and the send is rate limited on the server regardless — the button
-  // should stop asking rather than let someone lean on it.
+  // Spent while the server would refuse a second send anyway, so the button
+  // stops asking rather than letting someone lean on it.
   const sent = Boolean(mail?.ok);
+
+  // ...and comes back when the cooldown is up, because a customer whose mail
+  // never arrived has no other way to ask for it again. A throttled reply rode
+  // an older lock, so its window is shorter than this — waiting the full one
+  // only means the retry is certain to go through.
+  useEffect(() => {
+    if (!mail?.ok) return;
+
+    const timer = setTimeout(
+      () => setMail(null),
+      ESIM_MAIL_COOLDOWN_SECONDS * 1000,
+    );
+
+    return () => clearTimeout(timer);
+  }, [mail]);
 
   const spent = usage ? Math.round((usage.usedMb / usage.totalMb) * 100) : 0;
 
@@ -97,9 +88,9 @@ export function EsimCard({ esim }: { esim: Esim }) {
     esim.qrImage || esim.activationCode || esim.installLocked,
   );
 
-  // An expired card still holds its profile, so the customer can buy a new plan
-  // onto it and skip the install. Checkout does the actual picking; this only
-  // sends them there with the plan browser open.
+  // An expired card is a receipt, not a control. Its profile is already on the
+  // device, and topping it up starts at checkout — which picks the eSIM itself
+  // — so the card carries no actions at all.
   const expired = state === "expired";
 
   /**
@@ -168,8 +159,8 @@ export function EsimCard({ esim }: { esim: Esim }) {
 
             {plan && (
               <p className="mt-2 flex flex-wrap items-center gap-2">
-                <span className={spec}>{plan.data}</span>
-                <span className={spec}>
+                <span className={cardSpec}>{plan.data}</span>
+                <span className={cardSpec}>
                   {plan.days} day{plan.days === 1 ? "" : "s"}
                 </span>
               </p>
@@ -177,7 +168,7 @@ export function EsimCard({ esim }: { esim: Esim }) {
           </div>
         </div>
 
-        <span className={cn(pill, pillTone[state])}>
+        <span className={cn(cardPill, cardPillTone[state])}>
           {esimStateLabels[state]}
         </span>
       </div>
@@ -213,7 +204,10 @@ export function EsimCard({ esim }: { esim: Esim }) {
         </div>
       )}
 
-      {(esim.activatedAt || esim.expiresAt || esim.network) && (
+      {/* Dates and network only tell the customer something while the plan can
+          still be used. Once it is spent the chip already says so, and the rest
+          is history they did not ask for. */}
+      {!expired && (esim.activatedAt || esim.expiresAt || esim.network) && (
         <dl className="mt-5 flex flex-wrap gap-x-10 gap-y-4">
           {esim.activatedAt && (
             <Fact label="Activated" value={formatDay(esim.activatedAt)} />
@@ -221,7 +215,7 @@ export function EsimCard({ esim }: { esim: Esim }) {
 
           {esim.expiresAt && (
             <Fact
-              label={state === "expired" ? "Expired" : "Expires"}
+              label="Expires"
               value={
                 esim.daysLeft === undefined
                   ? formatDay(esim.expiresAt)
@@ -234,64 +228,51 @@ export function EsimCard({ esim }: { esim: Esim }) {
         </dl>
       )}
 
-      <div className="mt-6 flex flex-wrap items-center gap-3">
-        {expired && (
-          <Pressable href="/destinations" className={primary}>
-            <MdAdd aria-hidden className="h-4 w-4" />
-            Add a new plan
+      {!expired && installable && (
+        <div className="mt-6 flex flex-wrap items-center gap-3">
+          <Pressable
+            aria-haspopup="dialog"
+            aria-expanded={installing}
+            onClick={() => setInstalling(true)}
+            className={primary}
+          >
+            <MdQrCode2 aria-hidden className="h-4 w-4" />
+            Install details
           </Pressable>
-        )}
 
-        {installable && (
-          <>
-            <Pressable
-              aria-haspopup="dialog"
-              aria-expanded={installing}
-              onClick={() => setInstalling(true)}
-              className={expired ? secondary : primary}
-            >
-              <MdQrCode2 aria-hidden className="h-4 w-4" />
-              Install details
-            </Pressable>
-
-            {/* The profile is already on the device once a plan has expired;
-                re-sending the install mail has nothing left to tell them. */}
-            {!expired && (
-              <Pressable
-                onClick={() => void sendEmail()}
-                disabled={mailing || sent}
-                /* Stays disabled for the life of the page: one mail per visit
-                   is enough, and the confirmation reads as spent rather than
-                   as a button asking to be pressed again. */
-                title={
-                  sent && mail?.email
-                    ? mail.throttled
-                      ? `Already sent to ${mail.email}. Check your inbox.`
-                      : `Install details sent to ${mail.email}.`
-                    : undefined
-                }
-                className={cn(
-                  mailing || sent ? quiet : secondary,
-                  "gap-2 sm:ml-auto",
-                )}
-              >
-                {sent ? (
-                  <MdCheck aria-hidden className="h-4 w-4" />
-                ) : (
-                  <MdMailOutline aria-hidden className="h-4 w-4" />
-                )}
-                {sent
-                  ? mail?.throttled
-                    ? "Already sent"
-                    : "Sent"
-                  : mailing
-                    ? "Sending…"
-                    : "Resend email"}
-              </Pressable>
+          <Pressable
+            onClick={() => void sendEmail()}
+            disabled={mailing || sent}
+            /* Disabled until the server's cooldown is up, so the confirmation
+               reads as spent rather than as a button asking to be pressed
+               again. */
+            title={
+              sent && mail?.email
+                ? mail.throttled
+                  ? `Already sent to ${mail.email}. Check your inbox.`
+                  : `Install details sent to ${mail.email}.`
+                : undefined
+            }
+            className={cn(
+              sent ? done : mailing ? pending : secondary,
+              "gap-2 sm:ml-auto",
             )}
-          </>
-        )}
-      </div>
+          >
+            {sent ? (
+              <MdCheck aria-hidden className="h-4 w-4" />
+            ) : (
+              <MdMailOutline aria-hidden className="h-4 w-4" />
+            )}
+            {sent
+              ? mail?.throttled
+                ? "Already sent"
+                : "Sent"
+              : mailing
+                ? "Sending…"
+                : "Resend email"}
+          </Pressable>
+        </div>
+      )}
 
       {/* Announced only — the visible confirmation is the button itself, which
           a screen reader will not re-read when its label swaps to "Sent". */}
