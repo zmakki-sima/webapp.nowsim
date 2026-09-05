@@ -8,6 +8,14 @@ let client: Resend | null = null;
 
 export const FONT = "font-family:Arial,Helvetica,sans-serif";
 
+/**
+ * Where an answer lands. `AUTH_EMAIL_FROM` is a send-only mailbox on the mail
+ * subdomain, so without this header a customer who hits reply on a sign-in or
+ * delivery mail writes into nothing. Same address the mails already print in
+ * their own footer, so the two never disagree.
+ */
+export const REPLY_TO = "support@nowsim.com";
+
 export function escapeHtml(value: string): string {
   return value
     .replace(/&/g, "&amp;")
@@ -43,6 +51,7 @@ export async function deliver(message: Message): Promise<boolean> {
 
   const { error } = await client.emails.send({
     from: env.AUTH_EMAIL_FROM,
+    replyTo: REPLY_TO,
     to: message.to,
     subject: message.subject,
     text: message.text,
