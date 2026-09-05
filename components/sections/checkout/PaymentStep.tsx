@@ -144,13 +144,13 @@ export function PaymentStep({
         sees or stores your card number.
       </p>
 
-      <div className="mt-6 flex flex-wrap items-center justify-between gap-4 rounded-card border border-hairline bg-surface-soft p-4">
-        <p className="flex items-center gap-2.5 text-sm font-bold">
+      <div className="mt-6 flex flex-wrap items-center justify-center gap-x-4 gap-y-3 rounded-card border border-hairline bg-surface-soft p-4 sm:justify-between">
+        <p className="flex items-center justify-center gap-2.5 text-sm font-bold">
           <MdLock aria-hidden className="h-4 w-4 text-success" />
           Secure payment powered by Stripe
         </p>
 
-        <ul className="flex items-center gap-2">
+        <ul className="flex items-center justify-center gap-2">
           {cards.map((card) => (
             <li key={card.label}>
               <card.Icon aria-hidden className="h-6 w-6 text-ink/45" />
