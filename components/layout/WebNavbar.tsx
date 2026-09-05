@@ -12,11 +12,16 @@ import {
 import { CurrencyMenu } from "@/components/layout/CurrencyMenu";
 import { cn } from "@/lib/cn";
 
-import { MenuPanel, MenuToggle } from "@/components/layout/MobileMenu";
+import {
+  MenuPanel,
+  MenuScrim,
+  MenuToggle,
+} from "@/components/layout/MobileMenu";
 
 const HOME = "/";
 
 const navLinks = [
+  { label: "Home", href: HOME },
   { label: "Countries", href: "/destinations?kind=country" },
   { label: "Regions", href: "/destinations?kind=region" },
   { label: "Global", href: "/destinations?kind=global" },
@@ -85,6 +90,8 @@ export function WebNavbar() {
 
   return (
     <>
+      <MenuScrim open={open} onClose={close} />
+
       <header className="fixed inset-x-0 top-0 z-50 text-ink">
         <div className="pt-[env(safe-area-inset-top)]">
           <div
@@ -93,7 +100,11 @@ export function WebNavbar() {
               "absolute inset-0 border-b border-hairline",
               "bg-white/70 backdrop-blur-xl backdrop-saturate-150",
               "transition-opacity duration-300 ease-hover motion-reduce:transition-none",
-              scrolled || pathname !== HOME ? "opacity-100" : "opacity-0",
+              // An open menu needs the surface behind it even at the top of
+              // the home page, where the bar is otherwise transparent.
+              scrolled || open || pathname !== HOME
+                ? "opacity-100"
+                : "opacity-0",
             )}
           />
 
@@ -118,9 +129,9 @@ export function WebNavbar() {
               {/*
                 The nav is centred on the row rather than laid out between the
                 logo and the actions, so it overlaps them instead of pushing
-                them apart. At `md` the four links plus both side clusters do
-                not fit and "Help" ran under the currency menu; `lg` is the
-                first width where they clear each other.
+                them apart. At `md` the links plus both side clusters do not
+                fit and "Help" ran under the currency menu; `lg` is the first
+                width where they clear each other.
               */}
               <nav
                 aria-label="Main"
@@ -159,15 +170,17 @@ export function WebNavbar() {
               </div>
             </div>
           </div>
+
+          {/* Inside the bar, so the backdrop above stretches over the links
+              and the hairline lands under them. Its scrim stays outside. */}
+          <MenuPanel
+            links={navLinks}
+            open={open}
+            onClose={close}
+            panelId={panelId}
+          />
         </div>
       </header>
-
-      <MenuPanel
-        links={navLinks}
-        open={open}
-        onClose={close}
-        panelId={panelId}
-      />
     </>
   );
 }
