@@ -9,7 +9,7 @@ import {
   needsRefresh,
 } from "@/lib/auth/token";
 
-const PROTECTED = ["/esims"];
+const PROTECTED = ["/esims", "/purchases"];
 
 export async function proxy(request: NextRequest) {
   const decoded = await decryptSession(request.cookies.get(COOKIE)?.value);
