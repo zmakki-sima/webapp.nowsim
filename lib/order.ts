@@ -1,6 +1,6 @@
 import "server-only";
 
-import { clampQuantity } from "@/lib/checkout";
+import { parseQuantity } from "@/lib/checkout";
 import { getDestination } from "@/lib/data/catalog";
 import { scaleMoney, type Money } from "@/lib/money";
 import { isDestinationKind, type Destination, type Plan } from "@/lib/types";
@@ -38,7 +38,9 @@ export async function resolveOrder(
 
   if (!plan) return undefined;
 
-  const quantity = clampQuantity(one(searchParams.qty));
+  const quantity = parseQuantity(one(searchParams.qty));
+
+  if (quantity === undefined) return undefined;
 
   return {
     destination,

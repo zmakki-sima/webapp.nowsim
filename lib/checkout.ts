@@ -49,10 +49,22 @@ export type OrderParams = {
   qty: string;
 };
 
-export function clampQuantity(raw: string | undefined): number {
-  const parsed = Math.trunc(Number(raw));
+/**
+ * A quantity the checkout is willing to price, or `undefined` for anything else
+ * — which the page turns into its not-found screen.
+ *
+ * Silently clamping an edited `qty` was worse than refusing it: the URL said
+ * four, the summary said three, and the customer had no way to tell which one
+ * the card would be charged for. Omitting `qty` altogether still means one, so
+ * a hand-typed link without it keeps working.
+ */
+export function parseQuantity(raw: string | undefined): number | undefined {
+  if (raw === undefined || raw === "") return 1;
 
-  if (!Number.isFinite(parsed)) return 1;
+  const parsed = Number(raw);
 
-  return Math.min(MAX_ESIMS, Math.max(1, parsed));
+  if (!Number.isInteger(parsed)) return undefined;
+  if (parsed < 1 || parsed > MAX_ESIMS) return undefined;
+
+  return parsed;
 }
