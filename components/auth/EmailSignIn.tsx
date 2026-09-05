@@ -1,15 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import {
-  useActionState,
-  useEffect,
-  useRef,
-  useState,
-  type ReactNode,
-} from "react";
-import { MdCancel } from "react-icons/md";
-
+import { useActionState, useEffect, useState, type ReactNode } from "react";
 import {
   requestOtp,
   verifyOtp,
@@ -17,6 +9,7 @@ import {
   type EmailState,
 } from "@/app/actions/auth";
 import { useSetAccount } from "@/components/layout/SessionProvider";
+import { OtpInput } from "@/components/ui/OtpInput";
 import { Pressable } from "@/components/ui/Pressable";
 import { cn } from "@/lib/cn";
 
@@ -29,7 +22,6 @@ export type SignInTone = {
   helper: string;
   error: string;
   change: string;
-  clear: string;
 };
 
 export const lightTone: SignInTone = {
@@ -41,9 +33,9 @@ export const lightTone: SignInTone = {
   inert: "bg-surface-soft text-muted",
   helper: "text-muted",
   error: "text-danger",
-  change:
-    "border border-hairline text-ink hover:border-ink/25 hover:bg-surface-soft active:bg-surface-soft",
-  clear: "text-muted hover:text-ink active:text-ink",
+  /* A tint rather than a solid fill: solid brand would put two identical
+     purple buttons on the code step, and this one is not the primary action. */
+  change: "bg-brand/10 text-brand hover:bg-brand/16 active:bg-brand/16",
 };
 
 const button = cn(
@@ -51,12 +43,14 @@ const button = cn(
   "text-base font-bold tracking-[-0.01em]",
 );
 
+/**
+ * The email field. Authorization codes use `OtpInput` instead — six boxes, not
+ * one line. The brand tint on the border replaces the UA focus ring here, so
+ * `outline-none` is only safe alongside it.
+ */
 const field = cn(
   "w-full rounded-control border px-5 py-3.5",
   "text-base font-medium",
-  // Matches the authorization-code field on the eSIMs page: the brand tint on
-  // the border replaces the UA focus ring, so `outline-none` is only safe
-  // alongside it.
   "focus:border-brand/30 focus:outline-none",
   "transition-colors duration-300 ease-hover motion-reduce:transition-none",
 );
@@ -171,7 +165,6 @@ function CodeStep({
   onCancel?: () => void;
 }) {
   const [code, setCode] = useState("");
-  const inputRef = useRef<HTMLInputElement>(null);
   const remaining = useCountdown(resendAt);
 
   const [failed, setFailed] = useState(false);
@@ -182,21 +175,20 @@ function CodeStep({
     setFailed(state.error !== undefined);
   }
 
-  function clear() {
-    setCode("");
-    setFailed(false);
-    inputRef.current?.focus();
-  }
-
   return (
     <div className="flex flex-col gap-3">
-      <div className="flex items-center justify-between gap-3">
-        <p className="min-w-0 truncate text-base font-bold">{email}</p>
+      {/* The address is what the code was sent to, not the heading — it reads
+          one step down from the dialog title so the two do not compete. */}
+      <div className="mb-2 flex items-center justify-between gap-3">
+        <p className="min-w-0 truncate text-base font-medium text-muted">
+          {email}
+        </p>
 
         <Pressable
           onClick={onChangeEmail}
           className={cn(
             "shrink-0 rounded-full px-4 py-1.5 text-sm font-bold",
+            "transition-colors duration-300 ease-hover motion-reduce:transition-none",
             tone.change,
           )}
         >
@@ -207,47 +199,21 @@ function CodeStep({
       <form action={action} className="flex flex-col gap-2">
         <input type="hidden" name="email" value={email} />
 
-        <div className="relative">
-          <input
-            ref={inputRef}
-            name="code"
-            autoFocus
-            required
-            inputMode="numeric"
-            autoComplete="one-time-code"
-            maxLength={6}
-            placeholder="Authorization code"
-            aria-label="Authorization code"
-            aria-invalid={failed ? true : undefined}
-            value={code}
-            onChange={(event) => {
-              setCode(event.target.value.replace(/\D/g, "").slice(0, 6));
-              setFailed(false);
-            }}
-            className={cn(
-              field,
-              failed ? cn(tone.fieldError, "pr-14") : tone.fieldIdle,
-            )}
-          />
-
-          {failed && code !== "" ? (
-            <Pressable
-              onClick={clear}
-              className={cn(
-                "absolute right-4 top-1/2 -translate-y-1/2",
-                tone.clear,
-              )}
-            >
-              <MdCancel aria-hidden className="h-5 w-5" />
-              <span className="sr-only">Clear the code</span>
-            </Pressable>
-          ) : null}
-        </div>
+        <OtpInput
+          name="code"
+          autoFocus
+          value={code}
+          onChange={(next) => {
+            setCode(next);
+            setFailed(false);
+          }}
+          error={failed}
+        />
 
         <p
           role={failed ? "alert" : undefined}
           className={cn(
-            "text-sm",
+            "text-center text-sm",
             failed ? cn("font-medium", tone.error) : tone.helper,
           )}
         >
@@ -259,8 +225,12 @@ function CodeStep({
         {code !== "" ? (
           <Pressable
             type="submit"
-            disabled={pending}
-            className={cn(button, "mt-1", pending ? tone.inert : tone.primary)}
+            disabled={pending || code.length < 6}
+            className={cn(
+              button,
+              "mt-4 disabled:opacity-100",
+              pending || code.length < 6 ? tone.inert : tone.primary,
+            )}
           >
             {pending ? "Checking…" : "Continue"}
           </Pressable>
@@ -268,14 +238,18 @@ function CodeStep({
       </form>
 
       {code === "" ? (
-        <form action={resend} className="mt-1">
+        <form action={resend} className="mt-3">
           <input type="hidden" name="email" value={email} />
 
+          {/* The inert tone already reads as unavailable during the cooldown,
+              so the button keeps its own colour rather than fading out on top
+              of it — the same call the eSIM dialog makes. */}
           <Pressable
             type="submit"
             disabled={resending || remaining > 0}
             className={cn(
               button,
+              "disabled:opacity-100",
               remaining > 0 || resending ? tone.inert : tone.primary,
             )}
           >

@@ -76,6 +76,21 @@
 
   --duration-hover: 300ms;
 
+  /* The caret the OTP boxes draw for themselves — they hide the real one. */
+  --animate-caret-blink: caret-blink 1.2s steps(1, end) infinite;
+
+  @keyframes caret-blink {
+    0%,
+    70%,
+    100% {
+      opacity: 1;
+    }
+    20%,
+    50% {
+      opacity: 0;
+    }
+  }
+
   --header-height: 4.5rem;
 
   /*

@@ -82,7 +82,9 @@ export function SignInDialog({
       title={email ? "Sign in with email" : "Sign in to continue"}
     >
       {email ? (
-        <div className="mt-6">
+        /* Same clearance under the title the eSIM dialog uses, so the gap does
+           not change as the dialog moves between its steps. */
+        <div className="mt-8">
           {/*
             No `onCancel`: the dialog's own close button already dismisses it,
             so a Cancel button underneath would be a second control for the
@@ -101,7 +103,7 @@ export function SignInDialog({
         </div>
       ) : (
         <>
-          <div className="mt-6">
+          <div className="mt-8">
             <Pressable
               onClick={() => setEmail(true)}
               className={cn(

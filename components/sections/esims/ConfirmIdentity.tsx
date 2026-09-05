@@ -6,16 +6,12 @@ import { MdLockOutline } from "react-icons/md";
 
 import { confirmReauth, requestReauth, type ReauthState } from "@/app/actions/auth";
 import { lightTone } from "@/components/auth/EmailSignIn";
+import { OtpInput } from "@/components/ui/OtpInput";
 import { Pressable } from "@/components/ui/Pressable";
 import { cn } from "@/lib/cn";
 
-const field = cn(
-  "w-full rounded-control border px-5 py-3.5",
-  "text-base font-medium",
-  "focus:border-brand/30 focus:outline-none",
-  "transition-colors duration-300 ease-hover motion-reduce:transition-none",
-);
-
+// Not the sign-in button: that one is a `gap-3` row with tighter tracking,
+// because it carries an icon. This one is text only.
 const button = cn(
   "w-full justify-center rounded-control px-5 py-3.5 text-base font-bold",
 );
@@ -64,7 +60,7 @@ export function ConfirmIdentity({
 
   if (!sent?.sent) {
     return (
-      <div className="flex flex-col items-center gap-4 py-2 text-center">
+      <div className="flex flex-col items-center gap-4 pt-8 pb-2 text-center">
         <span
           aria-hidden
           className="flex h-14 w-14 items-center justify-center rounded-full bg-brand/12 text-brand"
@@ -98,47 +94,39 @@ export function ConfirmIdentity({
   }
 
   return (
-    <form action={action} className="flex flex-col gap-2 py-2">
-      <input
+    <form action={action} className="flex flex-col gap-2 pt-8 pb-2">
+      <OtpInput
         name="code"
         autoFocus
-        required
-        inputMode="numeric"
-        autoComplete="one-time-code"
-        maxLength={6}
-        placeholder="Authorization code"
-        aria-label="Authorization code"
-        aria-invalid={error ? true : undefined}
         value={code}
-        onChange={(event) =>
-          setCode(event.target.value.replace(/\D/g, "").slice(0, 6))
-        }
-        className={cn(field, error ? lightTone.fieldError : lightTone.fieldIdle)}
+        onChange={setCode}
+        error={error !== undefined}
       />
 
       <p
         role={error ? "alert" : undefined}
         className={cn(
-          "text-sm",
+          "text-center text-sm",
           error ? cn("font-medium", lightTone.error) : lightTone.helper,
         )}
       >
         {error ?? "Your authorization code has been sent to your email"}
       </p>
 
-      {code.length === 6 ? (
-        <Pressable
-          type="submit"
-          disabled={pending}
-          className={cn(
-            button,
-            "mt-1",
-            pending ? lightTone.inert : lightTone.primary,
-          )}
-        >
-          {pending ? "Checking…" : submitLabel}
-        </Pressable>
-      ) : null}
+      {/* Shown from the start so the dialog says what finishing the code does.
+          The inert tone already reads as unavailable, so it keeps its own
+          colour rather than fading out on top of it. */}
+      <Pressable
+        type="submit"
+        disabled={pending || code.length < 6}
+        className={cn(
+          button,
+          "mt-4 disabled:opacity-100",
+          pending || code.length < 6 ? lightTone.inert : lightTone.primary,
+        )}
+      >
+        {pending ? "Checking…" : submitLabel}
+      </Pressable>
     </form>
   );
 }
